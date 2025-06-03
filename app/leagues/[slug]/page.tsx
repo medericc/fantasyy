@@ -20,21 +20,12 @@ export default function LeaguePage() {
 
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedWeek, setSelectedWeek] = useState<Week | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
+  
   const [deck, setDeck] = useState<Choice[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [weekId, setWeekId] = useState<number | null>(null);
 
-  // Fetch user
-  useEffect(() => {
-    const fetchUser = async () => {
-      const res = await fetch('/api/dashboard');
-    
-      const json = await res.json();
-      setUserId(json?.[0]?.userId ?? null);
-    };
-    fetchUser();
-  }, []);
+
 
   // Fetch weeks
   useEffect(() => {
@@ -48,22 +39,23 @@ export default function LeaguePage() {
     fetchWeeks();
   }, [slug]);
 
-  // Fetch deck
-  useEffect(() => {
-    if (!userId || !selectedWeek) return;
-    const fetchDeck = async () => {
-      try {
-        const resWeekId = await fetch(`/api/week/id?slug=${slug}&name=${selectedWeek.name}`);
-        const { id } = await resWeekId.json();
-        setWeekId(id);
-        
-        // Ici tu pourrais fetch le deck avec ce weekId si nécessaire
-      } catch (err) {
-        console.error('Erreur fetchDeck:', err);
-      }
-    };
-    fetchDeck();
-  }, [userId, selectedWeek, slug]);
+// Récupération du weekId dès qu'on a une semaine sélectionnée
+useEffect(() => {
+  if (!selectedWeek) return;
+
+  const fetchWeekId = async () => {
+    try {
+      const res = await fetch(`/api/week/id?slug=${slug}&name=${selectedWeek.name}`);
+      const { id } = await res.json();
+      setWeekId(id);
+    } catch (err) {
+      console.error('Erreur lors de la récupération du weekId:', err);
+    }
+  };
+
+  fetchWeekId();
+}, [selectedWeek, slug]);
+
 
   // Fetch matches
   useEffect(() => {
@@ -79,22 +71,23 @@ export default function LeaguePage() {
     fetchMatches();
   }, [selectedWeek, slug]);
 useEffect(() => {
-  if (!userId || !weekId) return;
+  if (!weekId) return;
 
   const fetchDeck = async () => {
     try {
-      const res = await fetch(`/api/deck/${userId}/${weekId}`);
+      const res = await fetch(`/api/deck/${weekId}`);
       if (!res.ok) throw new Error("Erreur lors du chargement du deck");
 
       const data = await res.json();
-      setDeck(data); // ← ça remplit ton deck correctement
+      setDeck(data);
     } catch (err) {
       console.error("Erreur lors du fetch du deck:", err);
     }
   };
 
   fetchDeck();
-}, [userId, weekId]);
+}, [weekId]);
+
 
   return (
     <div className="p-6 space-y-4">
