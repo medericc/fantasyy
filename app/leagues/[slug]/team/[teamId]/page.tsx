@@ -40,14 +40,21 @@ export default function TeamPage() {
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    if (!teamId || !userId || !weekId) return;
-      console.log('[DEBUG] teamId:', teamId, 'userId:', userId, 'weekId:', weekId);
- 
-    fetch(`/api/players/by-team/${teamId}?userId=${userId}&weekId=${weekId}`)
-      .then(res => res.json())
-      .then(setPlayers);
- }, [teamId, userId, weekId]);
+useEffect(() => {
+  if (!teamId || userId === null || !weekId) {
+    console.log('[DEBUG] params pas prêts → teamId:', teamId, 'userId:', userId, 'weekId:', weekId);
+    return;
+  }
+
+  console.log('[DEBUG] Tous les paramètres sont bons → lancement du fetch des joueuses');
+  fetch(`/api/players/by-team/${teamId}?userId=${userId}&weekId=${weekId}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log('[DEBUG] Players received:', data);
+      setPlayers(data);
+    });
+}, [teamId, userId, weekId]);
+
 
   useEffect(() => {
    if (userId == null || weekId == null) return;
@@ -94,6 +101,13 @@ export default function TeamPage() {
 
   return (
     <div className="p-6 space-y-6">
+
+{!userId ? (
+      <div className="text-gray-600 italic">Chargement…</div>
+    ) : (
+      <>
+
+
       <div>
         <h1 className="text-2xl font-bold">Équipe #{teamId}</h1>
         <h2 className="text-lg text-gray-600">Semaine {weekId}</h2>
@@ -169,6 +183,8 @@ export default function TeamPage() {
           </ul>
         )}
       </div>
-    </div>
+      </>
+    )}
+  </div>
   );
 }

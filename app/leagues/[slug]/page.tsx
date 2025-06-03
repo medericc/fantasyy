@@ -38,6 +38,7 @@ export default function LeaguePage() {
   // Fetch weeks
   useEffect(() => {
     const fetchWeeks = async () => {
+      
       const res = await fetch(`/api/week/list?slug=${slug}`);
       const json = await res.json();
       setWeeks(json);
@@ -54,6 +55,7 @@ export default function LeaguePage() {
         const resWeekId = await fetch(`/api/week/id?slug=${slug}&name=${selectedWeek.name}`);
         const { id } = await resWeekId.json();
         setWeekId(id);
+        
         // Ici tu pourrais fetch le deck avec ce weekId si nécessaire
       } catch (err) {
         console.error('Erreur fetchDeck:', err);
