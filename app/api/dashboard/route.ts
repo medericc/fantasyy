@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   const userId = await getCurrentUserId(); // Clerk ou session
-
+ console.log("User ID récupéré :", userId);
   const leagues = ['LFB', 'LF2'];
 
   const results = await Promise.all(

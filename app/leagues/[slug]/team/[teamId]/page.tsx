@@ -20,49 +20,43 @@ type DeckPlayer = {
 };
 
 export default function TeamPage() {
-  const { slug, teamId } = useParams<{ slug: string; teamId: string }>();
+  const rawParams = useParams();
+  const teamId = rawParams?.teamId ? String(rawParams.teamId) : null;
   const searchParams = useSearchParams();
   const weekId = searchParams.get('weekId');
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [deck, setDeck] = useState<DeckPlayer[]>([]);
-  const [userId, setUserId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const isDeckFull = deck.length >= 5;
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const res = await fetch('/api/dashboard');
-      const json = await res.json();
-      setUserId(json?.[0]?.userId);
-    };
-    fetchUser();
-  }, []);
+    const numericTeamId = teamId ? Number(teamId) : NaN;
+    const numericWeekId = weekId ? Number(weekId) : NaN;
 
-useEffect(() => {
-  if (!teamId || userId === null || !weekId) {
-    console.log('[DEBUG] params pas prêts → teamId:', teamId, 'userId:', userId, 'weekId:', weekId);
-    return;
-  }
+    if (isNaN(numericTeamId) || isNaN(numericWeekId)) {
+      console.log('[DEBUG] Params pas prêts → teamId:', teamId, 'weekId:', weekId);
+      return;
+    }
 
-  console.log('[DEBUG] Tous les paramètres sont bons → lancement du fetch des joueuses');
-  fetch(`/api/players/by-team/${teamId}?userId=${userId}&weekId=${weekId}`)
-    .then(res => res.json())
-    .then(data => {
-      console.log('[DEBUG] Players received:', data);
-      setPlayers(data);
-    });
-}, [teamId, userId, weekId]);
-
+    console.log('[DEBUG] Params OK → fetch des joueuses');
+    fetch(`/api/players/by-team/${numericTeamId}?weekId=${numericWeekId}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('[DEBUG] Players received:', data);
+        setPlayers(data);
+      });
+  }, [teamId, weekId]);
 
   useEffect(() => {
-   if (userId == null || weekId == null) return;
+    const numericWeekId = weekId ? Number(weekId) : NaN;
+    if (isNaN(numericWeekId)) return;
 
-    fetch(`/api/deck/${userId}/${weekId}`)
+    fetch(`/api/deck/${numericWeekId}`)
       .then(res => res.json())
       .then(setDeck);
-  }, [userId, weekId]);
+  }, [weekId]);
 
   const isInDeck = (playerId: number) => deck.some(d => d.player.id === playerId);
 
@@ -70,7 +64,7 @@ useEffect(() => {
     setError(null);
     const res = await fetch('/api/deck/remove', {
       method: 'POST',
-      body: JSON.stringify({ userId, playerId, weekId }),
+      body: JSON.stringify({ playerId, weekId }),
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -86,7 +80,7 @@ useEffect(() => {
     setError(null);
     const res = await fetch('/api/deck/add', {
       method: 'POST',
-      body: JSON.stringify({ userId, playerId, weekId }),
+      body: JSON.stringify({ playerId, weekId }),
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -101,90 +95,85 @@ useEffect(() => {
 
   return (
     <div className="p-6 space-y-6">
+      {!weekId ? (
+        <div className="text-gray-600 italic">Chargement…</div>
+      ) : (
+        <>
+          <div>
+            <h1 className="text-2xl font-bold">Équipe #{teamId}</h1>
+            <h2 className="text-lg text-gray-600">Semaine {weekId}</h2>
+          </div>
 
-{!userId ? (
-      <div className="text-gray-600 italic">Chargement…</div>
-    ) : (
-      <>
+          {error && <div className="text-red-500">{error}</div>}
 
-
-      <div>
-        <h1 className="text-2xl font-bold">Équipe #{teamId}</h1>
-        <h2 className="text-lg text-gray-600">Semaine {weekId}</h2>
-      </div>
-
-      {error && <div className="text-red-500">{error}</div>}
-
-      <div>
-        <h3 className="text-xl font-semibold mb-2">Joueuses de l'équipe</h3>
-        <ul className="space-y-2">
-          {players.map(p => (
-            <li
-              key={p.id}
-              className="flex justify-between items-center border p-2 rounded"
-            >
-              <span>{p.forename} {p.name}</span>
-
-              {isInDeck(p.id) ? (
-                <span className="text-green-600 font-semibold">✅ Ajouté</span>
-              ) : p.isLocked ? (
-                <span className="text-gray-500 italic">Indisponible</span>
-              ) : isDeckFull ? (
-                <span
-                  className="text-gray-400 italic"
-                  title="Limite de 5 joueuses atteinte"
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Joueuses de l'équipe</h3>
+            <ul className="space-y-2">
+              {players.map(p => (
+                <li
+                  key={p.id}
+                  className="flex justify-between items-center border p-2 rounded"
                 >
-                  Limite atteinte
-                </span>
-              ) : (
-                <button
-                  disabled={isDeckFull}
-                  className={`px-2 py-1 rounded text-white ${
-                    isDeckFull
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600'
-                  }`}
-                  title={
-                    isDeckFull
-                      ? 'Limite de 5 joueuses atteinte'
-                      : 'Ajouter la joueuse'
-                  }
-                  onClick={() => handleAdd(p.id)}
-                >
-                  Ajouter
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+                  <span>{p.forename} {p.name}</span>
+                  {isInDeck(p.id) ? (
+                    <span className="text-green-600 font-semibold">✅ Ajouté</span>
+                  ) : p.isLocked ? (
+                    <span className="text-gray-500 italic">Indisponible</span>
+                  ) : isDeckFull ? (
+                    <span
+                      className="text-gray-400 italic"
+                      title="Limite de 5 joueuses atteinte"
+                    >
+                      Limite atteinte
+                    </span>
+                  ) : (
+                    <button
+                      disabled={isDeckFull}
+                      className={`px-2 py-1 rounded text-white ${
+                        isDeckFull
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-blue-600'
+                      }`}
+                      title={
+                        isDeckFull
+                          ? 'Limite de 5 joueuses atteinte'
+                          : 'Ajouter la joueuse'
+                      }
+                      onClick={() => handleAdd(p.id)}
+                    >
+                      Ajouter
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-      {/* 🔽 Bloc Deck actuel */}
-      <div>
-        <h3 className="text-xl font-semibold mb-2">🃏 Mon deck de la semaine</h3>
-        {deck.length === 0 ? (
-          <p className="text-gray-500 italic">Aucune joueuse sélectionnée.</p>
-        ) : (
-          <ul className="space-y-2">
-            {deck.map(({ player }) => (
-              <li
-                key={player.id}
-                className="flex justify-between items-center border p-2 rounded bg-gray-100"
-              >
-                <span>{player.forename} {player.name}</span>
-                <button
-                  className="bg-red-600 text-white px-2 py-1 rounded"
-                  onClick={() => handleRemove(player.id)}
-                >
-                  Supprimer
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      </>
-    )}
-  </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2">🃏 Mon deck de la semaine</h3>
+            {deck.length === 0 ? (
+              <p className="text-gray-500 italic">Aucune joueuse sélectionnée.</p>
+            ) : (
+              <ul className="space-y-2">
+                {deck.map(({ player }) => (
+                  <li
+                    key={player.id}
+                    className="flex justify-between items-center border p-2 rounded bg-gray-100"
+                  >
+                    <span>{player.forename} {player.name}</span>
+                    <button
+                      className="bg-red-600 text-white px-2 py-1 rounded"
+                      onClick={() => handleRemove(player.id)}
+                    >
+                      Supprimer
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 }

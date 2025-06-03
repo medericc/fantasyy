@@ -1,10 +1,15 @@
 // app/api/deck/add/route.ts
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma'; // et PAS depuis generated
-
+import { prisma } from '@/lib/prisma';
+import { getCurrentUserId } from '@/lib/auth';
 
 export async function POST(request: Request) {
-  const { userId, playerId, weekId } = await request.json();
+  const userId = await getCurrentUserId();
+  const { playerId, weekId } = await request.json();
+
+  if (!userId || !playerId || !weekId) {
+    return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
+  }
 
   // Vérifier si déjà choisie dans les 5 dernières semaines
   const blocked = await prisma.choice.findFirst({
@@ -13,7 +18,7 @@ export async function POST(request: Request) {
       player_id: playerId,
       week: {
         id: {
-          gte: weekId - 5, // ajuster selon le format réel des semaines
+          gte: weekId - 5,
           lt: weekId,
         },
       },
@@ -41,6 +46,9 @@ export async function POST(request: Request) {
       user_id: userId,
       player_id: playerId,
       week_id: weekId,
+    },
+    include: {
+      player: true,
     },
   });
 

@@ -1,9 +1,15 @@
 // app/api/deck/remove/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getCurrentUserId } from '@/lib/auth';
 
 export async function POST(request: Request) {
-  const { userId, playerId, weekId } = await request.json();
+  const userId = await getCurrentUserId();
+  const { playerId, weekId } = await request.json();
+
+  if (!userId || !playerId || !weekId) {
+    return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
+  }
 
   const deleted = await prisma.choice.deleteMany({
     where: {

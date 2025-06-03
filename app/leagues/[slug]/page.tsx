@@ -29,6 +29,7 @@ export default function LeaguePage() {
   useEffect(() => {
     const fetchUser = async () => {
       const res = await fetch('/api/dashboard');
+    
       const json = await res.json();
       setUserId(json?.[0]?.userId ?? null);
     };
