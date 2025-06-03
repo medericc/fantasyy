@@ -23,8 +23,6 @@ export default function LeaguePage() {
   
   const [deck, setDeck] = useState<Choice[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
-  const [weekId, setWeekId] = useState<number | null>(null);
-
 
 
   // Fetch weeks
@@ -39,43 +37,31 @@ export default function LeaguePage() {
     fetchWeeks();
   }, [slug]);
 
-// Récupération du weekId dès qu'on a une semaine sélectionnée
-useEffect(() => {
-  if (!selectedWeek) return;
-
-  const fetchWeekId = async () => {
-    try {
-      const res = await fetch(`/api/week/id?slug=${slug}&name=${selectedWeek.name}`);
-      const { id } = await res.json();
-      setWeekId(id);
-    } catch (err) {
-      console.error('Erreur lors de la récupération du weekId:', err);
-    }
-  };
-
-  fetchWeekId();
-}, [selectedWeek, slug]);
 
 
   // Fetch matches
-  useEffect(() => {
-    if (!selectedWeek) return;
-    const fetchMatches = async () => {
-      const resWeekId = await fetch(`/api/week/id?slug=${slug}&name=${selectedWeek.name}`);
-      const { id } = await resWeekId.json();
-      setWeekId(id);
-      const res = await fetch(`/api/games/by-week/${id}`);
+useEffect(() => {
+  if (!selectedWeek) return;
+
+  const fetchMatches = async () => {
+    try {
+      const res = await fetch(`/api/games/by-week/${selectedWeek.id}`);
       const data = await res.json();
       setMatches(data);
-    };
-    fetchMatches();
-  }, [selectedWeek, slug]);
+    } catch (err) {
+      console.error("Erreur fetch matches:", err);
+    }
+  };
+
+  fetchMatches();
+}, [selectedWeek]);
+
 useEffect(() => {
-  if (!weekId) return;
+  if (!selectedWeek) return;
 
   const fetchDeck = async () => {
     try {
-      const res = await fetch(`/api/deck/${weekId}`);
+      const res = await fetch(`/api/deck/${selectedWeek.id}`);
       if (!res.ok) throw new Error("Erreur lors du chargement du deck");
 
       const data = await res.json();
@@ -86,7 +72,8 @@ useEffect(() => {
   };
 
   fetchDeck();
-}, [weekId]);
+}, [selectedWeek]);
+
 
 
   return (
