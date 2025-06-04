@@ -1,7 +1,7 @@
 // app/api/dashboard/route.ts
 import { NextResponse } from 'next/server';
 import { getCurrentUserId } from '@/lib/auth'; // à adapter selon ton auth
-import { getTotalRanking, getWeeklyRanking } from '@/lib/ranking'; // à adapter
+import { getTotalRanking, getWeeklyRanking } from '@/lib/ranking_total'; // à adapter
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {

@@ -35,23 +35,29 @@ const [openPlayModal, setOpenPlayModal] = useState(false);
     week?: string;
   }>(null);
 
-  useEffect(() => {
-    const fetchAll = async () => {
+useEffect(() => {
+  const fetchAll = async () => {
+    try {
       const [resUser, resRanking] = await Promise.all([
         fetch('/api/dashboard'),
         fetch('/api/dashboard/rankings'),
       ]);
+
       const userJson = await resUser.json();
       const rankingJson = await resRanking.json();
 
       setUser(userJson);
       setRankingData(rankingJson);
-      setData(rankingJson); // On l'utilise aussi pour avoir les weeks
+      setData(rankingJson);
       setLoading(false);
-    };
+    } catch (error) {
+      console.error('Erreur lors du chargement des données :', error);
+    }
+  };
 
-    fetchAll();
-  }, []);
+  fetchAll();
+}, []);
+
 
   const weeks = (league: string) =>
     Object.keys(data[league]?.weekly || {}).sort();
