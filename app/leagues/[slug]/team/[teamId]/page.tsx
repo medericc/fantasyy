@@ -34,7 +34,7 @@ export default function TeamPage() {
   const [error, setError] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [pointsInput, setPointsInput] = useState<{ [playerId: number]: number }>({});
-
+  const [blockedIds, setBlockedIds] = useState<number[]>([]);
   const isDeckFull = deck.length >= 5;
   const router = useRouter();
   useEffect(() => {
@@ -59,6 +59,13 @@ export default function TeamPage() {
         setPlayers(data);
       });
   }, [teamId, weekId]);
+
+  useEffect(() => {
+  if (!weekId) return;
+  fetch(`/api/deck/blocked?weekId=${weekId}`)
+    .then(res => res.json())
+    .then(data => setBlockedIds(data.blocked));
+}, [weekId]);
 
   useEffect(() => {
     const numericWeekId = weekId ? Number(weekId) : NaN;
@@ -179,9 +186,9 @@ const handleUpdatePoints = async (playerId: number) => {
       </div>
 
       {/* Bouton ou statut de sélection */}
-      {isInDeck(p.id) ? (
+        {isInDeck(p.id) ? (
         <span className="text-green-600 font-semibold">✅ Ajouté</span>
-      ) : p.isLocked ? (
+      ) : blockedIds.includes(p.id) ? (
         <span className="text-gray-500 italic">Indisponible</span>
       ) : isDeckFull ? (
         <span
