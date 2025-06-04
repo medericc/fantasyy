@@ -95,6 +95,7 @@ model player_rate {
   player    player @relation(fields: [player_id], references: [id], onUpdate: Restrict, map: "FK_7DF66F0A99E6F5DF")
   week      week   @relation(fields: [week_id], references: [id], onUpdate: Restrict, map: "FK_7DF66F0AC86F3B2F")
 
+  @@unique([player_id, week_id])
   @@index([player_id], map: "IDX_7DF66F0A99E6F5DF")
   @@index([week_id], map: "IDX_7DF66F0AC86F3B2F")
 }
