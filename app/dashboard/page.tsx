@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import PlayModal from '@/components/PlayModal'; // ajuste le chemin si besoin
+import Header from '@/components/Header'; // ajuste si ton chemin est différent
+import Footer from '@/components/Footer';
 
 type LeagueRanking = {
   username: string;
@@ -88,6 +90,8 @@ useEffect(() => {
   if (loading) return <p className="p-4">Chargement du classement...</p>;
 
   return (
+    <div>
+    <Header />
     <div className="p-4 space-y-6">
       {Object.keys(rankingData).map((league) => {
         const latestWeek = weeks(league).slice(-1)[0];
@@ -166,6 +170,7 @@ useEffect(() => {
 
         );
       })}
-    </div>
+    </div><Footer />
+     </div>
   );
 }

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 type Team = { id: number; name: string };
 type Match = { id: number; date: string; team_home: Team; team_away: Team };
 type Player = {
@@ -77,6 +78,8 @@ useEffect(() => {
 
 
   return (
+    <div>
+    <Header />
     <div className="p-6 space-y-4">
       <h1 className="text-2xl font-bold uppercase">Ligue : {slug}</h1>
 
@@ -160,6 +163,6 @@ useEffect(() => {
           </ul>
         )}
       </div>
-    </div>
+    </div><Footer /> </div>
   );
 }

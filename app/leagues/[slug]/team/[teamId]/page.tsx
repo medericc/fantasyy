@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 type Player = {
   id: number;
   name: string;
@@ -94,6 +95,8 @@ export default function TeamPage() {
   };
 
   return (
+    <div>
+    <Header />
     <div className="p-6 space-y-6">
       {!weekId ? (
         <div className="text-gray-600 italic">Chargement…</div>
@@ -174,6 +177,6 @@ export default function TeamPage() {
           </div>
         </>
       )}
-    </div>
+    </div><Footer /> </div>
   );
 }
