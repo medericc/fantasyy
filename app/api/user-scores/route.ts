@@ -4,19 +4,16 @@ import { prisma } from "@/lib/prisma"; // adapte le chemin si besoin
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
-  // Optionnels : filtres userId, weekId, league
+  // Optionnels : filtres userId, weekId
   const userId = searchParams.get("userId");
   const weekId = searchParams.get("weekId");
-  const league = searchParams.get("league"); // "lfb" ou "lf2", optionnel
 
   let whereSql = "";
   if (userId) whereSql += ` AND c.user_id = ${Number(userId)} `;
   if (weekId) whereSql += ` AND c.week_id = ${Number(weekId)} `;
-  if (league === "lfb") whereSql += " AND c.week_id < 22 ";
-  if (league === "lf2") whereSql += " AND c.week_id >= 22 ";
 
-  // Par défaut, on retourne les scores LFB
-  if (!league) whereSql += " AND c.week_id < 22 ";
+  // Toujours LFB
+  whereSql += " AND c.week_id < 22 ";
 
   const scores = await prisma.$queryRawUnsafe(`
     SELECT 

@@ -1,11 +1,11 @@
 import { prisma } from '@/lib/prisma';
 
-export async function getWeeklyRanking(leagueId: number, weekId: number) {
+export async function getWeeklyRanking(weekId: number) {
   const choices = await prisma.choice.findMany({
     where: {
       week_id: weekId,
       week: {
-        league_id: leagueId,
+        league_id: 1, // LFB uniquement
       },
     },
     select: {
@@ -30,7 +30,7 @@ export async function getWeeklyRanking(leagueId: number, weekId: number) {
     },
   });
 
-  const userPointsMap = new Map<number, { pseudo: string, total: number }>();
+  const userPointsMap = new Map<number, { pseudo: string; total: number }>();
 
   for (const choice of choices) {
     const userId = choice.user_id;
@@ -45,34 +45,28 @@ export async function getWeeklyRanking(leagueId: number, weekId: number) {
     }
   }
 
-  const ranking = Array.from(userPointsMap.entries())
+  return Array.from(userPointsMap.entries())
     .map(([userId, { pseudo, total }]) => ({
       userId,
       pseudo,
       points: total,
     }))
     .sort((a, b) => b.points - a.points);
-
-  return ranking;
 }
 
-export async function getTotalRanking(leagueId: number) {
+export async function getTotalRanking() {
   const users = await prisma.user.findMany({
     select: {
       pseudo: true,
       ptl_lfb: true,
-      pt_lf2: true,
     },
-    orderBy: leagueId === 1 ? { ptl_lfb: 'desc' } : { pt_lf2: 'desc' },
-    where: leagueId === 1
-  ? { ptl_lfb: { not: undefined } }
-  : { pt_lf2: { not: undefined } },
-
+    orderBy: { ptl_lfb: 'desc' },
+    where: { ptl_lfb: { not: undefined } },
   });
 
   return users.map((user, index) => ({
     pseudo: user.pseudo ?? 'Anonyme',
-    points: leagueId === 1 ? user.ptl_lfb ?? 0 : user.pt_lf2 ?? 0,
+    points: user.ptl_lfb ?? 0,
     userId: index + 1,
   }));
 }

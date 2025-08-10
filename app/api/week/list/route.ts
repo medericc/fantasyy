@@ -1,12 +1,8 @@
-// /api/week/list/route.ts
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const slug = searchParams.get('slug');
-
-  const leagueId = slug?.toLowerCase() === 'lf2' ? 2 : 1;
+export async function GET() {
+  const leagueId = 1; // LFB uniquement
 
   const weeks = await prisma.week.findMany({
     where: { league_id: leagueId },
