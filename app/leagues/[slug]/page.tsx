@@ -18,6 +18,7 @@ type Week = { id: number; name: string };
 export default function LeaguePage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
+ const [highlightWeekId, setHighlightWeekId] = useState<number | null>(null);
 
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedWeek, setSelectedWeek] = useState<Week | null>(null);
@@ -48,22 +49,42 @@ useEffect(() => {
     const json: Week[] = await res.json();
     setWeeks(json);
 
-    // Regarder dans localStorage si un choix existe
     const savedWeekId = localStorage.getItem(`selectedWeek-${slug}`);
     if (savedWeekId) {
       const chosen = json.find((w) => w.id === Number(savedWeekId));
       if (chosen) {
         setSelectedWeek(chosen);
-        return; // ✅ on s'arrête là
+        return;
       }
     }
 
-    // Sinon, prendre la première
-    setSelectedWeek(json?.[0] ?? null);
+    // 🔹 Chercher la semaine la plus proche de maintenant
+    const now = new Date();
+
+    // On récupère la liste des matchs pour toutes les semaines
+    let closestWeek: Week | null = null;
+    for (const week of json) {
+      const resMatches = await fetch(`/api/games/by-week/${week.id}`);
+      const matches = await resMatches.json();
+
+      if (matches.length > 0) {
+        // date du premier match de la semaine
+        const firstMatchDate = new Date(matches[0].date);
+
+        if (firstMatchDate >= now) {
+          closestWeek = week;
+           setHighlightWeekId(week.id);
+          break; // on prend la première semaine future et on arrête
+        }
+      }
+    }
+
+    setSelectedWeek(closestWeek ?? json[0] ?? null);
   };
 
   fetchWeeks();
 }, [slug]);
+
 
 
 
@@ -112,21 +133,25 @@ useEffect(() => {
 
       <div>
         <label className="mr-2">Semaine :</label>
-        <select
-          value={selectedWeek?.id || ''}
-          onChange={(e) => {
-            const id = parseInt(e.target.value, 10);
-            const chosen = weeks.find((w) => w.id === id);
-            setSelectedWeek(chosen ?? null);
-          }}
-          className="border rounded px-2 py-1"
-        >
-          {weeks.map((week) => (
-            <option key={week.id} value={week.id}>
-              {week.name}
-            </option>
-          ))}
-        </select>
+       <select
+            value={selectedWeek?.id || ''}
+            onChange={(e) => {
+              const id = parseInt(e.target.value, 10);
+              const chosen = weeks.find((w) => w.id === id);
+              setSelectedWeek(chosen ?? null);
+            }}
+            className="border rounded px-2 py-1"
+          >
+            {weeks.map((week) => (
+              <option
+                key={week.id}
+                value={week.id}
+                className={week.id === highlightWeekId ? "bg-yellow-200" : ""}
+              >
+                {week.name}
+              </option>
+            ))}
+          </select>
       </div>
 
       <div className="space-y-2">
