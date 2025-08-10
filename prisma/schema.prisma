@@ -45,6 +45,7 @@ model game {
   team_home_id Int?
   team_away_id Int
   week_id      Int
+  match_date   DateTime
   team_away    team  @relation("AwayGames", fields: [team_away_id], references: [id])
   team_home    team? @relation("HomeGames", fields: [team_home_id], references: [id])
   week         week  @relation(fields: [week_id], references: [id])

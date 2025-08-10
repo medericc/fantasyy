@@ -25,18 +25,45 @@ export default function LeaguePage() {
   const [deck, setDeck] = useState<Choice[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
 
+// Charger depuis localStorage
+useEffect(() => {
+  const savedWeekId = localStorage.getItem(`selectedWeek-${slug}`);
+  if (savedWeekId && weeks.length > 0) {
+    const chosen = weeks.find(w => w.id === Number(savedWeekId));
+    if (chosen) setSelectedWeek(chosen);
+  }
+}, [weeks, slug]);
+
+// Sauvegarder quand on change
+useEffect(() => {
+  if (selectedWeek) {
+    localStorage.setItem(`selectedWeek-${slug}`, String(selectedWeek.id));
+  }
+}, [selectedWeek, slug]);
 
   // Fetch weeks
-  useEffect(() => {
-    const fetchWeeks = async () => {
-      
-      const res = await fetch(`/api/week/list?slug=${slug}`);
-      const json = await res.json();
-      setWeeks(json);
-      setSelectedWeek(json?.[0] ?? null);
-    };
-    fetchWeeks();
-  }, [slug]);
+useEffect(() => {
+  const fetchWeeks = async () => {
+    const res = await fetch(`/api/week/list?slug=${slug}`);
+    const json: Week[] = await res.json();
+    setWeeks(json);
+
+    // Regarder dans localStorage si un choix existe
+    const savedWeekId = localStorage.getItem(`selectedWeek-${slug}`);
+    if (savedWeekId) {
+      const chosen = json.find((w) => w.id === Number(savedWeekId));
+      if (chosen) {
+        setSelectedWeek(chosen);
+        return; // ✅ on s'arrête là
+      }
+    }
+
+    // Sinon, prendre la première
+    setSelectedWeek(json?.[0] ?? null);
+  };
+
+  fetchWeeks();
+}, [slug]);
 
 
 
