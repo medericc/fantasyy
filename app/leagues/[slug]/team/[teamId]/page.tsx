@@ -11,6 +11,7 @@ type Player = {
   name: string;
   forename: string;
   team_id: number;
+  rate?: number; // ajout pour éviter erreur TS
   isLocked?: boolean;
 };
 
@@ -33,7 +34,7 @@ export default function TeamPage() {
   const [deck, setDeck] = useState<DeckPlayer[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
-  const [pointsInput, setPointsInput] = useState<{ [playerId: number]: number }>({});
+  // const [pointsInput, setPointsInput] = useState<{ [playerId: number]: number }>({});
   const [blockedIds, setBlockedIds] = useState<number[]>([]);
   const isDeckFull = deck.length >= 5;
   const router = useRouter();
@@ -110,29 +111,29 @@ export default function TeamPage() {
       setDeck(prev => [...prev, newChoice]);
     }
   };
-const handlePointInputChange = (playerId: number, value: string) => {
-  const num = parseFloat(value);
-  setPointsInput(prev => ({ ...prev, [playerId]: num }));
-};
+// const handlePointInputChange = (playerId: number, value: string) => {
+//   const num = parseFloat(value);
+//   setPointsInput(prev => ({ ...prev, [playerId]: num }));
+// };
 
-const handleUpdatePoints = async (playerId: number) => {
-  const newPoints = pointsInput[playerId];
-  if (isNaN(newPoints)) return alert("Points invalides");
-  if (!weekId) return alert("Semaine non définie");
+// const handleUpdatePoints = async (playerId: number) => {
+//   const newPoints = pointsInput[playerId];
+//   if (isNaN(newPoints)) return alert("Points invalides");
+//   if (!weekId) return alert("Semaine non définie");
 
-  const res = await fetch('/api/player/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerId, weekId: Number(weekId), newRate: newPoints }),
-  });
+//   const res = await fetch('/api/player/update', {
+//     method: 'POST',
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify({ playerId, weekId: Number(weekId), newRate: newPoints }),
+//   });
 
-  if (!res.ok) {
-    const { error } = await res.json();
-    alert(error || 'Erreur lors de la mise à jour');
-  } else {
-    alert('Points mis à jour !');
-  }
-};
+//   if (!res.ok) {
+//     const { error } = await res.json();
+//     alert(error || 'Erreur lors de la mise à jour');
+//   } else {
+//     alert('Points mis à jour !');
+//   }
+// };
   return (
     <div>
     <Header />
@@ -163,18 +164,37 @@ const handleUpdatePoints = async (playerId: number) => {
       className="flex justify-between items-center border p-2 rounded"
     >
       <div className="flex items-center space-x-4">
-        {/* ✅ Bloc admin pour modifier les points */}
+
+        {/* Bloc admin points */}
         {role === 'admin' && (
           <div className="flex items-center space-x-2">
             <input
               type="number"
               placeholder="Points"
+              value={p.rate ?? ""}
               className="border rounded px-2 py-1 w-20"
-              onChange={(e) => handlePointInputChange(p.id, e.target.value)}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value) || 0;
+                setPlayers((prev) =>
+                  prev.map((pl) =>
+                    pl.id === p.id ? { ...pl, rate: val } : pl
+                  )
+                );
+              }}
             />
             <button
               className="bg-purple-600 text-white px-2 py-1 rounded"
-              onClick={() => handleUpdatePoints(p.id)}
+              onClick={() => {
+                fetch("/api/admin/update-player-rate", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    playerId: p.id,
+                    weekId: weekId,
+                    rate: p.rate,
+                  }),
+                });
+              }}
             >
               Valider
             </button>
@@ -185,31 +205,19 @@ const handleUpdatePoints = async (playerId: number) => {
         <span>{p.forename} {p.name}</span>
       </div>
 
-      {/* Bouton ou statut de sélection */}
-        {isInDeck(p.id) ? (
+      {/* Bouton ou statut */}
+      {isInDeck(p.id) ? (
         <span className="text-green-600 font-semibold">✅ Ajouté</span>
       ) : blockedIds.includes(p.id) ? (
         <span className="text-gray-500 italic">Indisponible</span>
       ) : isDeckFull ? (
-        <span
-          className="text-gray-400 italic"
-          title="Limite de 5 joueuses atteinte"
-        >
-          Limite atteinte
-        </span>
+        <span className="text-gray-400 italic">Limite atteinte</span>
       ) : (
         <button
           disabled={isDeckFull}
           className={`px-2 py-1 rounded text-white ${
-            isDeckFull
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600'
+            isDeckFull ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'
           }`}
-          title={
-            isDeckFull
-              ? 'Limite de 5 joueuses atteinte'
-              : 'Ajouter la joueuse'
-          }
           onClick={() => handleAdd(p.id)}
         >
           Ajouter

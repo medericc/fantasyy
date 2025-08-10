@@ -1,30 +1,20 @@
+// lib/ranking_total.ts
 import { prisma } from '@/lib/prisma';
 
-export async function getWeeklyRanking(weekId: number) {
+export async function getWeeklyRanking(leagueId: number, weekId: number) {
   const choices = await prisma.choice.findMany({
     where: {
       week_id: weekId,
       week: {
-        league_id: 1, // LFB uniquement
+        league_id: leagueId, // filtrage dynamique
       },
     },
     select: {
       user_id: true,
+      points: true,
       user: {
         select: {
           pseudo: true,
-        },
-      },
-      player: {
-        select: {
-          player_rate: {
-            where: {
-              week_id: weekId,
-            },
-            select: {
-              rate: true,
-            },
-          },
         },
       },
     },
@@ -35,13 +25,12 @@ export async function getWeeklyRanking(weekId: number) {
   for (const choice of choices) {
     const userId = choice.user_id;
     const pseudo = choice.user?.pseudo ?? 'Anonyme';
-    const rates = choice.player.player_rate.map(r => r.rate);
-    const total = rates.reduce((sum, rate) => sum + rate, 0);
+    const points = choice.points ?? 0;
 
     if (!userPointsMap.has(userId)) {
-      userPointsMap.set(userId, { pseudo, total });
+      userPointsMap.set(userId, { pseudo, total: points });
     } else {
-      userPointsMap.get(userId)!.total += total;
+      userPointsMap.get(userId)!.total += points;
     }
   }
 
@@ -54,19 +43,35 @@ export async function getWeeklyRanking(weekId: number) {
     .sort((a, b) => b.points - a.points);
 }
 
-export async function getTotalRanking() {
+export async function getTotalRanking(leagueId: number) {
+  // On récupère tous les utilisateurs ayant participé dans cette ligue
   const users = await prisma.user.findMany({
     select: {
+      id: true,
       pseudo: true,
-      ptl_lfb: true,
+      choice: {
+        where: {
+          week: {
+            league_id: leagueId,
+          },
+        },
+        select: { points: true },
+      },
     },
-    orderBy: { ptl_lfb: 'desc' },
-    where: { ptl_lfb: { not: undefined } },
   });
 
-  return users.map((user, index) => ({
-    pseudo: user.pseudo ?? 'Anonyme',
-    points: user.ptl_lfb ?? 0,
-    userId: index + 1,
-  }));
+  const rankings = users.map((user) => {
+    const totalPoints = user.choice.reduce(
+      (sum, choice) => sum + (choice.points ?? 0),
+      0
+    );
+
+    return {
+      pseudo: user.pseudo ?? 'Anonyme',
+      points: totalPoints,
+    };
+  });
+
+  // Classement décroissant
+  return rankings.sort((a, b) => b.points - a.points);
 }
