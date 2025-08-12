@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -28,12 +31,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [rankingData, setRankingData] = useState<LeagueData>({});
   const [user, setUser] = useState<{ username: string } | null>(null);
-  const [selectedWeek, setSelectedWeek] = useState<{ [league: string]: string }>({});
-  const [openModal, setOpenModal] = useState<null | {
-    league: string;
-    mode: 'weekly' | 'total';
+  const [modal, setModal] = useState<{
+    open: boolean;
+    type: 'weekly' | 'total' | null;
     week?: string;
-  }>(null);
+  }>({ open: false, type: null });
 
   const router = useRouter();
 
@@ -63,38 +65,70 @@ export default function DashboardPage() {
   const weeks = (league: string) =>
     Object.keys(data[league]?.weekly || {}).sort();
 
-  const renderTable = (rankings: LeagueRanking[], user?: { username: string } | null) => (
-    <table className="w-full mt-4 border">
-      <thead>
-        <tr className="bg-gray-100">
-          <th className="p-2 text-left">#</th>
-          <th className="p-2 text-left">Joueur</th>
-          <th className="p-2 text-left">Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rankings.map((r, i) => (
-          <tr
-            key={r.username}
-            className={`border-t ${user?.username === r.username ? 'bg-yellow-100 font-bold' : ''}`}
-          >
-            <td className="p-2">{i + 1}</td>
-            <td className="p-2">{r.username}</td>
-            <td className="p-2">
-              {openModal?.mode === 'weekly' ? r.weekPoints : r.totalPoints}
-            </td>
+  const renderTable = (rankings: LeagueRanking[], title: string) => (
+    <div className="mt-4 overflow-x-auto max-h-[70vh]">
+      <table className="w-full rounded-lg overflow-hidden border">
+        <thead className="bg-gray-800 sticky top-0">
+          <tr>
+            <th className="p-3 text-left text-white">#</th>
+            <th className="p-3 text-left text-white">Joueur</th>
+            <th className="p-3 text-left text-white">Points</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {rankings.map((r, i) => (
+            <tr
+              key={r.username}
+              className={`${user?.username === r.username ? 'bg-yellow-50 font-medium' : 'hover:bg-gray-50'}`}
+            >
+              <td className="p-3">{i + 1}</td>
+              <td className="p-3">{r.username}</td>
+              <td className="p-3 font-medium">
+                {modal.type === 'weekly' ? r.weekPoints : r.totalPoints}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
-  if (loading) return <p className="p-4">Chargement du classement...</p>;
+  const openWeeklyModal = (league: string) => {
+    const latestWeek = weeks(league).slice(-1)[0];
+    setModal({
+      open: true,
+      type: 'weekly',
+      week: latestWeek
+    });
+  };
+
+  const openTotalModal = () => {
+    setModal({
+      open: true,
+      type: 'total'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="p-4 space-y-6">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-      <div className="p-4 space-y-6">
+      
+      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-8 mt-5">
+        <div className="bg-white p-2  shadow-sm border">
+          <p className="text-center text-gray-700 ">
+            Pour chaque journée, sélectionner jusqu&lsquo;à 5 joueuses. Toute joueuse choisie devient indisponible pendant 6 semaines. Les points sont attribués selon leurs performances réelles.
+          </p>
+        </div>
+
         {Object.keys(rankingData).map((league) => {
           const latestWeek = weeks(league).slice(-1)[0];
           const weekRankings = rankingData[league]?.weekly?.[latestWeek] || [];
@@ -104,84 +138,76 @@ export default function DashboardPage() {
           const userTotal = totalRankings.find((r) => r.username === user?.username);
 
           return (
-            <div key={league} className="border rounded p-4 shadow space-y-2">
-              <h2 className="text-xl font-bold">{league}</h2>
-
-              {userWeekly && (
-                <p className="text-sm text-gray-700">
-                  🏅 {userWeekly.weekIndex + 1}e semaine {latestWeek} – {userWeekly.weekPoints} pts
-                </p>
-              )}
-
-              {userTotal && (
-                <p className="text-sm text-gray-700">
-                  🏆 {userTotal.totalIndex + 1}e total – {userTotal.totalPoints} pts
-                </p>
-              )}
-
-              <button
-                onClick={() => {
-                  setOpenModal({
-                    league,
-                    mode: 'weekly',
-                    week: latestWeek,
-                  });
-                  setSelectedWeek((prev) => ({ ...prev, [league]: latestWeek }));
-                }}
-                className="text-blue-600 underline"
-              >
-                Voir classement semaine
-              </button>
-              <button
-                onClick={() => setOpenModal({ league, mode: 'total' })}
-                className="text-green-600 underline ml-4"
-              >
-                Voir classement saison
-              </button>
-
-              {/* Nouveau bouton PLAY */}
-              <button
-                onClick={() => router.push(`/leagues/${league}`)}
-                className="text-purple-600 underline ml-4"
-              >
-                PLAY
-              </button>
-
-              {openModal?.league === league && openModal?.mode === 'weekly' && (
-                <div>
-                  <div className="mb-2">
-                    <label htmlFor={`week-select-${league}`}>Semaine : </label>
-                    <select
-                      id={`week-select-${league}`}
-                      value={selectedWeek[league] || latestWeek}
-                      onChange={(e) => {
-                        const week = e.target.value;
-                        setSelectedWeek((prev) => ({ ...prev, [league]: week }));
-                        setOpenModal((prev) =>
-                          prev ? { ...prev, week } : prev
-                        );
-                      }}
-                      className="border rounded px-2 py-1"
-                    >
-                      {weeks(league).map((w) => (
-                        <option key={w} value={w}>
-                          {w}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {renderTable(
-                    rankingData[league]?.weekly?.[selectedWeek[league] || latestWeek] || [],
-                    user
-                  )}
+            <div key={league} className="space-y-6">
+            
+              {/* User Stats */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
+                  <p className="text-sm font-medium text-gray-500">Semaine</p>
+                  <p className="text-xl font-bold text-gray-800">
+                    {userWeekly ? `${userWeekly.weekIndex}e` : '-'}
+                  </p>
+                  <p className="text-sm text-gray-600">{userWeekly?.weekPoints || 0} pts</p>
                 </div>
-              )}
+                <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
+                  <p className="text-sm font-medium text-gray-500">Saison</p>
+                  <p className="text-xl font-bold text-gray-800">
+                    {userTotal ? `${userTotal.totalIndex}e` : '-'}
+                  </p>
+                  <p className="text-sm text-gray-600">{userTotal?.totalPoints || 0} pts</p>
+                </div>
+              </div>
 
-              {openModal?.league === league && openModal?.mode === 'total' && renderTable(totalRankings)}
+              {/* Buttons for Rankings */}
+              <div className="grid grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-white"
+                  onClick={() => openWeeklyModal(league)}
+                >
+                  Voir classement semaine
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-white"
+                  onClick={openTotalModal}
+                >
+                  Voir classement saison
+                </Button>
+              </div>
             </div>
           );
         })}
+      </main>
+
+      {/* Play Button */}
+      <div className="p-4 max-w-md mx-auto w-full mb-8">
+        <Button 
+          size="lg" 
+          className="w-full py-6 text-lg font-bold shadow-md bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          onClick={() => router.push('/leagues/lfb')}
+        >
+          JOUER
+        </Button>
       </div>
+
+      {/* Rankings Modals */}
+      <Dialog open={modal.open} onOpenChange={(open) => setModal({...modal, open})}>
+        <DialogContent className="sm:max-w-[90%] max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {modal.type === 'weekly' ? 'Classement Semaine' : 'Classement Saison'}
+            </DialogTitle>
+          </DialogHeader>
+          {modal.type === 'weekly' && rankingData[Object.keys(rankingData)[0]]?.weekly[modal.week || ''] && (
+            renderTable(rankingData[Object.keys(rankingData)[0]].weekly[modal.week || ''], 'Semaine')
+          )}
+          {modal.type === 'total' && rankingData[Object.keys(rankingData)[0]]?.total && (
+            renderTable(rankingData[Object.keys(rankingData)[0]].total, 'Saison')
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Footer />
     </div>
   );

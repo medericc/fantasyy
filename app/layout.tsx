@@ -4,9 +4,9 @@ import "./globals.css";
 import {
   ClerkProvider,
   SignInButton,
-  SignedIn,
+  
   SignedOut,
-  UserButton
+ 
 } from '@clerk/nextjs'
 import CookieBanner from "@/components/CookieBanner";
 
@@ -48,9 +48,7 @@ export default function RootLayout({
       <SignedOut>
         <SignInButton />
       </SignedOut>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
+    
       {children}
       <CookieBanner />
     </body>

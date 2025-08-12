@@ -1,10 +1,15 @@
-'use client';
+ 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 type Player = {
   id: number;
@@ -134,126 +139,158 @@ export default function TeamPage() {
 //     alert('Points mis à jour !');
 //   }
 // };
+
+const handleUpdateRate = async (playerId: number, newRate: number) => {
+    const res = await fetch('/api/admin/update-player-rate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerId, weekId, rate: newRate }),
+    });
+    
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || 'Erreur mise à jour');
+    }
+  };
+
   return (
-    <div>
-    <Header />
-    <div className="p-6 space-y-6">
-       <button
-        onClick={() => router.back()}
-        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
-      >
-        ← Retour
-      </button>
-      {!weekId ? (
-        <div className="text-gray-600 italic">Chargement…</div>
-      ) : (
-        <>
-          <div>
-            <h1 className="text-2xl font-bold">Équipe #{teamId}</h1>
-            <h2 className="text-lg text-gray-600">Semaine {weekId}</h2>
-          </div>
-
-          {error && <div className="text-red-500">{error}</div>}
-
-          <div>
-            <h3 className="text-xl font-semibold mb-2">Joueuses de l'équipe</h3>
-           <ul className="space-y-2">
-  {players.map(p => (
-    <li
-      key={p.id}
-      className="flex justify-between items-center border p-2 rounded"
-    >
-      <div className="flex items-center space-x-4">
-
-        {/* Bloc admin points */}
-        {role === 'admin' && (
-          <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              placeholder="Points"
-              value={p.rate ?? ""}
-              className="border rounded px-2 py-1 w-20"
-              onChange={(e) => {
-                const val = parseFloat(e.target.value) || 0;
-                setPlayers((prev) =>
-                  prev.map((pl) =>
-                    pl.id === p.id ? { ...pl, rate: val } : pl
-                  )
-                );
-              }}
-            />
-            <button
-              className="bg-purple-600 text-white px-2 py-1 rounded"
-              onClick={() => {
-                fetch("/api/admin/update-player-rate", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    playerId: p.id,
-                    weekId: weekId,
-                    rate: p.rate,
-                  }),
-                });
-              }}
-            >
-              Valider
-            </button>
-          </div>
-        )}
-
-        {/* Nom de la joueuse */}
-        <span>{p.forename} {p.name}</span>
-      </div>
-
-      {/* Bouton ou statut */}
-      {isInDeck(p.id) ? (
-        <span className="text-green-600 font-semibold">✅ Ajouté</span>
-      ) : blockedIds.includes(p.id) ? (
-        <span className="text-gray-500 italic">Indisponible</span>
-      ) : isDeckFull ? (
-        <span className="text-gray-400 italic">Limite atteinte</span>
-      ) : (
-        <button
-          disabled={isDeckFull}
-          className={`px-2 py-1 rounded text-white ${
-            isDeckFull ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600'
-          }`}
-          onClick={() => handleAdd(p.id)}
+   <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-6">
+        <Button 
+          variant="outline" 
+          onClick={() => router.back()}
+          className="gap-2"
         >
-          Ajouter
-        </button>
-      )}
-    </li>
-  ))}
-</ul>
+          ← Retour
+        </Button>
 
-          </div>
+        {!weekId ? (
+          <div className="text-center py-8 text-gray-500">Chargement...</div>
+        ) : (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Équipe #{teamId}</CardTitle>
+                <p className="text-gray-600">Semaine {weekId}</p>
+              </CardHeader>
+            </Card>
 
-          <div>
-            <h3 className="text-xl font-semibold mb-2">🃏 Mon deck de la semaine</h3>
-            {deck.length === 0 ? (
-              <p className="text-gray-500 italic">Aucune joueuse sélectionnée.</p>
-            ) : (
-              <ul className="space-y-2">
-                {deck.map(({ player }) => (
-                  <li
-                    key={player.id}
-                    className="flex justify-between items-center border p-2 rounded bg-gray-100"
-                  >
-                    <span>{player.forename} {player.name}</span>
-                    <button
-                      className="bg-red-600 text-white px-2 py-1 rounded"
-                      onClick={() => handleRemove(player.id)}
-                    >
-                      Supprimer
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
             )}
-          </div>
-        </>
-      )}
-    </div><Footer /> </div>
+
+            <Card>
+            
+              <CardContent className="space-y-3">
+                {players.map(p => (
+                  <div 
+                    key={p.id} 
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                  
+                      
+                      <div>
+                        <p className="font-medium">{p.forename} {p.name}</p>
+                        {role === 'admin' && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <Input
+                              type="number"
+                              value={p.rate ?? ''}
+                              onChange={(e) => {
+                                const val = parseFloat(e.target.value) || 0;
+                                setPlayers(prev => 
+                                  prev.map(pl => 
+                                    pl.id === p.id ? {...pl, rate: val} : pl
+                                  )
+                                );
+                              }}
+                              className="w-20 h-8"
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => p.rate && handleUpdateRate(p.id, p.rate)}
+                            >
+                              Valider
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {isInDeck(p.id) ? (
+                      <Badge variant="secondary">Dans ton deck</Badge>
+                    ) : blockedIds.includes(p.id) ? (
+                      <Badge variant="outline">Indisponible</Badge>
+                    ) : isDeckFull ? (
+                      <Badge variant="outline">Limite atteinte</Badge>
+                    ) : (
+                      <Button 
+                        size="sm"
+                        onClick={() => handleAdd(p.id)}
+                      >
+                        Ajouter
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>🃏 Mon deck de la semaine</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {deck.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">
+                    Aucune joueuse sélectionnée
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {deck.map(({ player }) => (
+                      <div 
+                        key={player.id} 
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback>
+                              {player.forename.charAt(0)}{player.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{player.forename} {player.name}</span>
+                        </div>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemove(player.id)}
+                        >
+                          Retirer
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="justify-center">
+                <Badge variant="outline">
+                  {deck.length}/5 joueuses sélectionnées
+                </Badge>
+              </CardFooter>
+            </Card>
+          </>
+        )}
+      </main>
+      
+      <Footer />
+    </div>
+
+    
   );
 }
