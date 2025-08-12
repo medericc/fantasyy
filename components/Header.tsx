@@ -80,7 +80,10 @@ export default function Header() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowLogoutModal(false)}>
+            <Button variant="outline" onClick={() => {
+  setShowLogoutModal(false);
+  signOut({ redirectUrl: '/' });
+}}>
               Annuler
             </Button>
             <Button
