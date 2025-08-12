@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 type Player = {
   id: number;
@@ -34,6 +33,7 @@ export default function TeamPage() {
   const teamId = rawParams?.teamId ? String(rawParams.teamId) : null;
   const searchParams = useSearchParams();
   const weekId = searchParams.get('weekId');
+  const [teamName, setTeamName] = useState<string | null>(null);
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [deck, setDeck] = useState<DeckPlayer[]>([]);
@@ -81,6 +81,17 @@ export default function TeamPage() {
       .then(res => res.json())
       .then(setDeck);
   }, [weekId]);
+
+  useEffect(() => {
+  if (!teamId) return;
+
+  fetch(`/api/team/name-by-id?id=${teamId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data?.name) setTeamName(data.name);
+    })
+    .catch(err => console.error('Erreur fetch team name:', err));
+}, [teamId]);
 
   const isInDeck = (playerId: number) => deck.some(d => d.player.id === playerId);
 
@@ -171,9 +182,11 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
         ) : (
           <>
             <Card>
-              <CardHeader>
-                <CardTitle className="text-xl">Équipe #{teamId}</CardTitle>
-                <p className="text-gray-600">Semaine {weekId}</p>
+              <CardHeader className="text-center">
+             <CardTitle className="text-xl">
+  {teamName ? `${teamName}` : `#${teamId}`}
+</CardTitle>
+   <p className="text-gray-600">Semaine {weekId}</p>
               </CardHeader>
             </Card>
 
@@ -183,7 +196,7 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
               </div>
             )}
 
-            <Card>
+            
             
               <CardContent className="space-y-3">
                 {players.map(p => (
@@ -240,11 +253,11 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
                   </div>
                 ))}
               </CardContent>
-            </Card>
+            
 
             <Card>
               <CardHeader>
-                <CardTitle>🃏 Mon deck de la semaine</CardTitle>
+                <CardTitle className="text-center">Mon Deck de la Semaine</CardTitle>
               </CardHeader>
               <CardContent>
                 {deck.length === 0 ? (
@@ -259,11 +272,7 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
                         className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback>
-                              {player.forename.charAt(0)}{player.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
+                          
                           <span>{player.forename} {player.name}</span>
                         </div>
                         <Button
