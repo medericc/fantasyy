@@ -289,8 +289,8 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
               </CardContent>
               <CardFooter className="justify-center">
                 <Badge variant="outline">
-                  {deck.length}/5 joueuses sélectionnées
-                </Badge>
+    {deck.length}/5 {deck.length === 1 ? "joueuse sélectionnée" : "joueuses sélectionnées"}
+  </Badge>
               </CardFooter>
             </Card>
           </>

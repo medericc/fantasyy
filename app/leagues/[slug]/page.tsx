@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Card, CardHeader,  CardContent, CardFooter } from '@/components/ui/card';
 
 type Team = { id: number; name: string };
 type Match = { id: number; date: string; team_home: Team; team_away: Team };
@@ -132,6 +132,32 @@ const teamLogos: Record<string, string> = {
   "Charleville": "/flammes.webp",
   "Chartres BL": "/chartres.webp",
 };
+const handleRemove = async (playerId: number) => {
+  if (!selectedWeek) return;
+
+  try {
+    const res = await fetch(`/api/deck/remove`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        playerId,
+        weekId: selectedWeek.id,
+      }),
+    });
+
+    if (!res.ok) throw new Error("Erreur lors de la suppression");
+
+    const { deleted } = await res.json();
+
+    if (deleted > 0) {
+      setDeck((prev) => prev.filter(({ player }) => player.id !== playerId));
+    }
+  } catch (err) {
+    console.error("Erreur suppression joueuse:", err);
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -216,33 +242,54 @@ const teamLogos: Record<string, string> = {
           )}
         </div>
 
-        {/* Deck */}
-        <div className="mt-6 p-4 bg-gray-50 border rounded shadow">
-        <h2 className="text-lg text-center font-bold mb-2">
-          Ton Deck 
-        </h2>
+       {/* Deck */}
+<Card>
+  <CardHeader>
+    <h2 className="text-lg text-center font-bold">Mon Deck de la Semaine</h2>
+  </CardHeader>
+  <CardContent>
+    {deck.length === 0 ? (
+      <p className="text-gray-500 text-center py-4">
+        Aucune joueuse sélectionnée
+      </p>
+    ) : (
+      <div className="space-y-2">
+        {deck.map(({ player }) => (
+          <div
+            key={player.id}
+            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          >
+            <div className="flex items-center gap-3">
+              <span>{player.name}</span>
+              <span className="text-sm text-gray-500">{player.team}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-green-700 text-sm">
+                {typeof player.player_rate?.[0]?.rate === 'number'
+                  ? `${player.player_rate[0].rate} pts`
+                  : '—'}
+              </span>
+          <Button
+  variant="destructive"
+  size="sm"
+  onClick={() => handleRemove(player.id)}
+>
+  Retirer
+</Button>
 
-        {deck.length === 0 ? (
-          <p className="text-sm text-gray-500">Aucune joueuse sélectionnée.</p>
-        ) : (
-          <ul className="space-y-1">
-            {deck.map(({ player }) => (
-              <li
-                key={player.id}
-                className="flex justify-between border-b py-1 text-sm"
-              >
-                <span>{player.name}</span>
-                <span className="text-gray-600">{player.team}</span>
-                <span className="text-green-700">
-                  {typeof player.player_rate?.[0]?.rate === 'number'
-                    ? `${player.player_rate[0].rate} pts`
-                    : '—'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div> </main>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </CardContent>
+  <CardFooter className="justify-center">
+  <Badge variant="outline">
+    {deck.length}/5 {deck.length === 1 ? "joueuse sélectionnée" : "joueuses sélectionnées"}
+  </Badge>
+  </CardFooter>
+</Card>
+ </main>
       
       <Footer />
     </div>
