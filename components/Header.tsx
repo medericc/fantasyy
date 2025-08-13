@@ -36,7 +36,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2">
             <Image 
-              src="/logo.png" 
+              src="/lololom.png" 
               alt="Logo" 
               width={32} 
               height={32}

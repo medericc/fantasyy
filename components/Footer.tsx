@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="bg-gray-100 text-gray-700 mt-2 px-6 py-8 border-t">
       {/* Logo */}
       <div className="flex justify-center mb-4">
-        <Image src="/logo.png" alt="Logo" width={50} height={50} />
+        <Image src="/lololom.png" alt="Logo" width={50} height={50} />
       </div>
 
       {/* Liens */}
@@ -32,7 +32,7 @@ export default function Footer() {
         <span className="hidden sm:inline">|</span>
 
         <a
-          href="https://instagram.com/firstpick46"
+          href="https://instagram.com/firstpickbasket"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:underline text-gray-800"

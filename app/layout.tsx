@@ -3,9 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import {
   ClerkProvider,
-  SignInButton,
-  
-  SignedOut,
+ 
  
 } from '@clerk/nextjs'
 import CookieBanner from "@/components/CookieBanner";
@@ -45,9 +43,7 @@ export default function RootLayout({
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
+  
     
       {children}
       <CookieBanner />

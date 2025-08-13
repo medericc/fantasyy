@@ -38,6 +38,7 @@ export default function SignInPage() {
                 "border border-neutral-300 hover:bg-neutral-200 transition-colors rounded-lg",
             headerTitle: "text-2xl font-bold text-yellow-400",
             headerSubtitle: "text-neutral-400",
+            
               footerActionLink: "text-yellow-500 hover:text-yellow-400",
               formFieldInput:
                 "bg-neutral-100 border border-neutral-300 text-black placeholder-neutral-500 focus:border-yellow-400 rounded-lg",
