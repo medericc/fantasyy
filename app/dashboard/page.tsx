@@ -156,7 +156,7 @@ console.log("=== USER JSON ===", userJson);
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       
-      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-8 mt-2">
+      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-8 mt-2 xl:mt-10">
         <div className="bg-white p-2  shadow-sm border">
           <p className="text-center text-gray-700 ">
             Pour chaque journée, sélectionner jusqu&lsquo;à 5 joueuses. Toute joueuse choisie devient indisponible pendant 6 semaines. Les points sont attribués selon leurs performances réelles.
@@ -175,7 +175,7 @@ console.log("=== USER JSON ===", userJson);
             <div key={league} className="space-y-6">
             
               {/* User Stats */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 xl:mt-4">
                 <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
                   <p className="text-sm font-medium text-gray-500">Semaine</p>
                   <p className="text-xl font-bold text-gray-800">
@@ -193,7 +193,7 @@ console.log("=== USER JSON ===", userJson);
               </div>
 
               {/* Buttons for Rankings */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 xl:mt-6">
                <Button 
   variant="outline" 
   className="w-full bg-white text-sm sm:text-base max-[400px]:text-[13.1px] max-[375px]:text-[11px]"
@@ -216,7 +216,7 @@ console.log("=== USER JSON ===", userJson);
       </main>
 
       {/* Play Button */}
-      <div className="p-4 max-w-md mx-auto w-full mb-2">
+      <div className="p-4 max-w-md mx-auto w-full mb-2 xl:mb-10">
         <Button 
           size="lg" 
           className="w-full py-6 text-lg font-bold shadow-md bg-gradient-to-r from-yellow-600 to-yellow-600 hover:from-yellow-700 hover:to-yellow-700 text-white"

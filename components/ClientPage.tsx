@@ -1,49 +1,60 @@
-// app/_components/ClientPage.tsx
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { updatePseudo } from "../actions/secretActions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function ClientPage({ pseudo }: { pseudo: string | null }) {
   const [open, setOpen] = useState(!pseudo);
   const [input, setInput] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = async () => {
-    if (input.trim().length < 3) return alert("Pseudo trop court");
-    const res = await updatePseudo(input);
-    if (res.success) {
-      setOpen(false);
-    } else {
-      alert("Erreur : " + res.error);
-    }
-  };
+ const handleSubmit = async () => {
+  const trimmed = input.trim();
+  
+  if (trimmed.length < 3) {
+    return alert("Pseudo trop court");
+  }
+  if (trimmed.length > 17) {
+    return alert("Pseudo trop long (max 17 caractères)");
+  }
+
+  const res = await updatePseudo(trimmed);
+  if (res.success) {
+    setOpen(false);
+    router.push("/dashboard"); // 🚀 redirection directe
+  } else {
+    alert("Erreur : " + res.error);
+  }
+};
+
 
   return (
-    <>
-      {open && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full">
-            <h2 className="text-xl font-bold mb-4 text-center">Choisis ton pseudo</h2>
-            <input
-              className="w-full p-2 border rounded mb-4"
-              placeholder="ex: JeanBaptiste77"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              Valider
-            </button>
-          </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="sm:max-w-sm rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-center text-xl font-bold">
+            Choisis ton pseudo
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <Input
+            placeholder="ex: JeanBaptiste77"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="text-center text-lg font-medium rounded-xl"
+          />
+          <Button
+            onClick={handleSubmit}
+            className="w-full rounded-xl bg-yellow-600 hover:bg-yellow-700 text-white font-semibold"
+          >
+            Valider
+          </Button>
         </div>
-      )}
-      {!open && (
-        <div className="p-8 text-center">
-          <h1 className="text-2xl font-bold">Bienvenue {pseudo} !</h1>
-        </div>
-      )}
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

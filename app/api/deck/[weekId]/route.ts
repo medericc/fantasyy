@@ -6,7 +6,7 @@ import { getCurrentUserId } from '@/lib/auth';
 export async function GET(_req: Request, { params }: { params: { weekId: string } }) {
   const userId = await getCurrentUserId();
   const weekId = Number(params.weekId);
-
+ console.log("🔍 API /deck - userId:", userId, "weekId reçu:", weekId);
   if (!userId || isNaN(weekId)) {
     return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
   }
