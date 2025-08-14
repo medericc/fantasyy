@@ -1,3 +1,4 @@
+// app/api/deck/add/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUserId } from '@/lib/auth';
@@ -10,6 +11,20 @@ export async function POST(request: Request) {
 
   if (!userId || !playerId || isNaN(parsedWeekId)) {
     return NextResponse.json({ error: 'Missing or invalid parameters' }, { status: 400 });
+  }
+
+  // 🔒 Vérifier si la semaine a déjà commencé
+  const weekLimit = await prisma.game.aggregate({
+    where: { week_id: parsedWeekId },
+    _min: { match_date: true },
+  });
+
+  const limitDate = weekLimit._min.match_date;
+  if (limitDate && new Date() >= limitDate) {
+    return NextResponse.json(
+      { error: 'The week has already started. Deck changes are locked.' },
+      { status: 403 }
+    );
   }
 
   // Vérifier si déjà choisie dans les 5 dernières semaines
@@ -42,6 +57,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Maximum 5 players per week' }, { status: 400 });
   }
 
+  // Créer le choix
   const choice = await prisma.choice.create({
     data: {
       user_id: userId,

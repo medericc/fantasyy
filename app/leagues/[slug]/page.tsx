@@ -133,6 +133,8 @@ const teamLogos: Record<string, string> = {
   "Charleville": "/flammes.webp",
   "Chartres BL": "/chartres.webp",
 };
+
+
 const handleRemove = async (playerId: number) => {
   if (!selectedWeek) return;
 

@@ -163,7 +163,20 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
       setError(data.error || 'Erreur mise à jour');
     }
   };
-
+const teamOutlineColors: Record<string, string> = {
+  "UF Angers": "text-black border-black",
+  "Lyon ASVEL": "text-pink-500 border-pink-500",
+  "Tango Bourges": "text-orange-500 border-orange-500",
+  "Charnay BBS": "text-pink-400 border-pink-400",
+  "ESBVA Lille": "text-red-500 border-red-500",
+  "Landerneau BB": "text-violet-500 border-violet-500",
+  "Basket Landes": "text-sky-300 border-sky-300",
+  "Lattes-Montpellier": "text-blue-500 border-blue-500",
+  "Roche Vendée": "text-red-500 border-red-500",
+  "Toulouse MB": "text-pink-500 border-pink-500",
+  "Charleville": "text-black border-black",
+  "Chartres BL": "text-blue-400 border-blue-400",
+};
   return (
    <div className="min-h-screen flex flex-col">
       <Header />
@@ -224,13 +237,18 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
                               }}
                               className="w-20 h-8"
                             />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => p.rate && handleUpdateRate(p.id, p.rate)}
-                            >
-                              Valider
-                            </Button>
+                        <Button
+  variant="outline"
+  size="sm"
+className={
+  teamName && teamOutlineColors[teamName]
+    ? teamOutlineColors[teamName]
+    : "text-gray-500 border-gray-500"
+}
+  onClick={() => p.rate && handleUpdateRate(p.id, p.rate)}
+>
+  Valider
+</Button>
                           </div>
                         )}
                       </div>

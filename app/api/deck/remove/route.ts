@@ -9,15 +9,30 @@ export async function POST(request: Request) {
 
   const parsedWeekId = parseInt(weekId, 10);
 
-if (!userId || !playerId || isNaN(parsedWeekId)) {
-  return NextResponse.json({ error: 'Missing or invalid parameters' }, { status: 400 });
-}
+  if (!userId || !playerId || isNaN(parsedWeekId)) {
+    return NextResponse.json({ error: 'Missing or invalid parameters' }, { status: 400 });
+  }
 
+  // 🔒 Vérifier si la semaine a déjà commencé
+  const weekLimit = await prisma.game.aggregate({
+    where: { week_id: parsedWeekId },
+    _min: { match_date: true },
+  });
+
+  const limitDate = weekLimit._min.match_date;
+  if (limitDate && new Date() >= limitDate) {
+    return NextResponse.json(
+      { error: 'The week has already started. Deck changes are locked.' },
+      { status: 403 }
+    );
+  }
+
+  // Supprimer le choix
   const deleted = await prisma.choice.deleteMany({
     where: {
       user_id: userId,
       player_id: playerId,
-       week_id: parseInt(weekId, 10),
+      week_id: parsedWeekId,
     },
   });
 
