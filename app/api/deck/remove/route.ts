@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const limitDate = weekLimit._min.match_date;
   if (limitDate && new Date() >= limitDate) {
     return NextResponse.json(
-      { error: 'The week has already started. Deck changes are locked.' },
+      { error: 'Désolé, votre deck est bloqué.' },
       { status: 403 }
     );
   }
