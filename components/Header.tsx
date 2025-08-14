@@ -31,41 +31,48 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
-          
-          {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <Image 
-              src="/lololom.png" 
-              alt="Logo" 
-              width={32} 
-              height={32}
-              className="rounded-lg"
-            />
-            <span className="text-lg font-semibold tracking-tight">Fantasy LFB</span>
-          </Link>
+  <div className="container flex h-16 items-center justify-between px-4 
+                  md:justify-center md:gap-[40%] xl:ml-18 xl:gap-[31%] 2xl:gap-[25%] 2xl:ml-128">
+    
+    {/* Logo + texte */}
+    <Link href="/dashboard" 
+      className="flex items-center gap-2 md:gap-3">
+      <Image 
+        src="/lololom.png" 
+        alt="Logo" 
+        width={32} 
+        height={32}
+        className="rounded-lg"
+      />
+      <span className="text-lg font-semibold tracking-tight">
+        Fantasy LFB
+      </span>
+    </Link>
 
-          {/* Avatar cliquable qui ouvre directement la modale */}
-          <button
-            className="flex items-center gap-2 rounded-full p-1 hover:bg-gray-100 transition-colors"
-            onClick={() => setShowLogoutModal(true)}
-          >
-            {user?.imageUrl ? (
-              <Image
-                src={user.imageUrl}
-                alt="Avatar"
-                width={36}
-                height={36}
-                className="rounded-full border"
-              />
-            ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 border">
-                <User className="h-4 w-4 text-gray-600" />
-              </div>
-            )}
-          </button>
+    {/* Avatar + pseudo */}
+    <button
+      className="flex items-center gap-2 rounded-full p-1 hover:bg-gray-100 transition-colors"
+      onClick={() => setShowLogoutModal(true)}
+    >
+      {user?.imageUrl ? (
+        <Image
+          src={user.imageUrl}
+          alt="Avatar"
+          width={36}
+          height={36}
+          className="rounded-full border"
+        />
+      ) : (
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 border">
+          <User className="h-4 w-4 text-gray-600" />
         </div>
-      </header>
+      )}
+      {/* Pseudo seulement en tablette et + */}
+      <span className="hidden md:inline text-sm font-medium">{pseudo}</span>
+    </button>
+  </div>
+</header>
+
 
       {/* Modale de déconnexion */}
       <Dialog open={showLogoutModal} onOpenChange={setShowLogoutModal}>
