@@ -29,7 +29,7 @@ export default function LeaguePage() {
   const [selectedWeek, setSelectedWeek] = useState<Week | null>(null);
   const [deck, setDeck] = useState<Choice[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
-
+const [weekLocked, setWeekLocked] = useState(false);
   // Charger depuis localStorage
   useEffect(() => {
     const savedWeekId = localStorage.getItem(`selectedWeek-${slug}`);
@@ -84,6 +84,19 @@ export default function LeaguePage() {
 
     fetchWeeks();
   }, [slug]);
+
+useEffect(() => {
+  if (!selectedWeek?.id) return;
+
+  fetch(`/api/week/status?weekId=${selectedWeek.id}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data?.startDate) {
+        const start = new Date(data.startDate);
+        setWeekLocked(new Date() >= start);
+      }
+    });
+}, [selectedWeek?.id]);
 
   // Fetch matches
   useEffect(() => {
@@ -276,12 +289,13 @@ const handleRemove = async (playerId: number) => {
                   : '—'}
               </span>
           <Button
-  variant="destructive"
-  size="sm"
-  onClick={() => handleRemove(player.id)}
->
-  Retirer
-</Button>
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemove(player.id)}
+                          disabled={weekLocked}
+                        >
+                          Retirer
+                        </Button>
 
             </div>
           </div>
