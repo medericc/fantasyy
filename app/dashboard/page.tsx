@@ -68,50 +68,64 @@ console.log("=== USER JSON ===", userJson);
   const weeks = (league: string) =>
     Object.keys(data[league]?.weekly || {}).sort();
 
-  const renderTable = (rankings: LeagueRanking[], title: string) => (
-    <div className="mt-4 overflow-x-auto max-h-[70vh]">
-  <table className="w-full rounded-lg overflow-hidden border">
-    <thead className="bg-gray-800 sticky top-0">
-      <tr>
-        <th className="p-3 text-left text-white">#</th>
-        <th className="p-3 text-left text-white">Joueur</th>
-        <th className="p-3 text-left text-white">Points</th>
-      </tr>
-    </thead>
-    <tbody className="divide-y divide-gray-200">
-      
-    {rankings.map((r, i) => {
-  const isCurrentUser = 
-    user?.username?.trim().toLowerCase() === r.username.trim().toLowerCase();
- console.log(i + 1, r.username, "isCurrentUser:", isCurrentUser);
+ const renderTable = (rankings: LeagueRanking[], title: string) => {
+  if (!user?.username) return null;
+
+  // Trouver l'entrée du joueur actuel
+  const currentUserRow = rankings.find(
+    r => r.username.trim().toLowerCase() === user.username.trim().toLowerCase()
+  );
+
+  // Le reste du classement sans l'utilisateur
+  const otherRows = rankings.filter(
+    r => r.username.trim().toLowerCase() !== user.username.trim().toLowerCase()
+  );
+
+  // Nouveau classement : joueur actuel en premier, puis les autres
+  const reorderedRankings = currentUserRow ? [currentUserRow, ...otherRows] : rankings;
+
   return (
-    <tr
-      key={r.username}
-      className={`${isCurrentUser ? 'bg-yellow-200 font-medium' : 'hover:bg-gray-50'}`}
-    >
-      <td className="p-3">{i + 1}</td>
-      <td className="p-3">
-        {isCurrentUser ? (
-          <span className="py-1 rounded font-semibold">
-            {r.username}
-          </span>
-        ) : (
-          r.username
-        )}
-      </td>
-      <td className="p-3 font-medium">
-        {modal.type === 'weekly' ? r.weekPoints : r.totalPoints}
-      </td>
-    </tr>
+    <div className="mt-4 overflow-x-auto max-h-[70vh]">
+      <table className="w-full rounded-lg overflow-hidden border">
+        <thead className="bg-gray-800 sticky top-0">
+          <tr>
+            <th className="p-3 text-left text-white">#</th>
+            <th className="p-3 text-left text-white">Joueur</th>
+            <th className="p-3 text-left text-white">Points</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {reorderedRankings.map((r) => {
+            const isCurrentUser =
+              r.username.trim().toLowerCase() === user.username.trim().toLowerCase();
+            return (
+              <tr
+                key={r.username}
+                className={`${isCurrentUser ? 'bg-yellow-200 font-medium' : 'hover:bg-gray-50'}`}
+              >
+                {/* On affiche toujours la vraie position */}
+                <td className="p-3">
+                  {modal.type === 'weekly' ? r.weekIndex : r.totalIndex}e
+                </td>
+                <td className="p-3">
+                  {isCurrentUser ? (
+                    <span className="py-1 rounded font-semibold">{r.username}</span>
+                  ) : (
+                    r.username
+                  )}
+                </td>
+                <td className="p-3 font-medium">
+                  {modal.type === 'weekly' ? r.weekPoints : r.totalPoints}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
-})}
+};
 
-
-    </tbody>
-  </table>
-</div>
-
-  );
 
   const openWeeklyModal = (league: string) => {
     const latestWeek = weeks(league).slice(-1)[0];
@@ -182,14 +196,14 @@ console.log("=== USER JSON ===", userJson);
               <div className="grid grid-cols-2 gap-4">
                <Button 
   variant="outline" 
-  className="w-full bg-white text-sm sm:text-base max-[375px]:text-xs"
+  className="w-full bg-white text-sm sm:text-base max-[400px]:text-[13.1px] max-[375px]:text-[11px]"
   onClick={() => openWeeklyModal(league)}
 >
   Voir classement semaine
 </Button>
 <Button 
   variant="outline" 
-  className="w-full bg-white text-sm sm:text-base max-[375px]:text-xs"
+  className="w-full bg-white text-sm sm:text-base max-[400px]:text-[13.1px] max-[375px]:text-[11px]"
   onClick={openTotalModal}
 >
   Voir classement saison
