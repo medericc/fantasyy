@@ -33,7 +33,7 @@ export default function ClientPage({ pseudo }: { pseudo: string | null }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-sm rounded-2xl">
+      <DialogContent className="sm:max-w-sm rounded-2xl" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold">
             Choisis ton pseudo
