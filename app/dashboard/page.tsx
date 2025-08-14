@@ -122,7 +122,7 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       
-      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-8 mt-5">
+      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-8 mt-2">
         <div className="bg-white p-2  shadow-sm border">
           <p className="text-center text-gray-700 ">
             Pour chaque journée, sélectionner jusqu&lsquo;à 5 joueuses. Toute joueuse choisie devient indisponible pendant 6 semaines. Les points sont attribués selon leurs performances réelles.
@@ -160,20 +160,21 @@ export default function DashboardPage() {
 
               {/* Buttons for Rankings */}
               <div className="grid grid-cols-2 gap-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full bg-white"
-                  onClick={() => openWeeklyModal(league)}
-                >
-                  Voir classement semaine
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full bg-white"
-                  onClick={openTotalModal}
-                >
-                  Voir classement saison
-                </Button>
+               <Button 
+  variant="outline" 
+  className="w-full bg-white text-sm sm:text-base max-[375px]:text-xs"
+  onClick={() => openWeeklyModal(league)}
+>
+  Voir classement semaine
+</Button>
+<Button 
+  variant="outline" 
+  className="w-full bg-white text-sm sm:text-base max-[375px]:text-xs"
+  onClick={openTotalModal}
+>
+  Voir classement saison
+</Button>
+
               </div>
             </div>
           );
@@ -181,10 +182,10 @@ export default function DashboardPage() {
       </main>
 
       {/* Play Button */}
-      <div className="p-4 max-w-md mx-auto w-full mb-8">
+      <div className="p-4 max-w-md mx-auto w-full mb-2">
         <Button 
           size="lg" 
-          className="w-full py-6 text-lg font-bold shadow-md bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          className="w-full py-6 text-lg font-bold shadow-md bg-gradient-to-r from-yellow-600 to-yellow-600 hover:from-yellow-700 hover:to-yellow-700 text-white"
           onClick={() => router.push('/leagues/lfb')}
         >
           JOUER
