@@ -12,24 +12,21 @@ export default function Footer() {
       </div>
 
       {/* Liens */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 text-sm flex-wrap">
+      <div className="flex flex-wrap justify-center items-center gap-4 text-sm">
         <Link href="/privacy" className="hover:underline text-gray-800">
-          Politique de confidentialité
+          <span className="sm:inline hidden">Politique de confidentialité</span>
+          <span className="inline sm:hidden">Politique</span>
         </Link>
-
-        <span className="hidden sm:inline">|</span>
 
         <Link href="/terms" className="hover:underline text-gray-800">
-          Conditions d’utilisation
+          <span className="sm:inline hidden">Conditions d’utilisation</span>
+          <span className="inline sm:hidden">Conditions</span>
         </Link>
-
-        <span className="hidden sm:inline">|</span>
 
         <Link href="/legal" className="hover:underline text-gray-800">
-          Mentions légales
+          <span className="sm:inline hidden">Mentions légales</span>
+          <span className="inline sm:hidden">Mentions</span>
         </Link>
-
-        <span className="hidden sm:inline">|</span>
 
         <a
           href="https://instagram.com/firstpickbasket"
@@ -37,7 +34,8 @@ export default function Footer() {
           rel="noopener noreferrer"
           className="hover:underline text-gray-800"
         >
-          Contact Instagram
+          <span className="sm:inline hidden">Contact Instagram</span>
+          <span className="inline sm:hidden">Contact</span>
         </a>
       </div>
 
