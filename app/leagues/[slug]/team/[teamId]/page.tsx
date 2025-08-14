@@ -34,6 +34,7 @@ export default function TeamPage() {
   const searchParams = useSearchParams();
   const weekId = searchParams.get('weekId');
   const [teamName, setTeamName] = useState<string | null>(null);
+const [weekLocked, setWeekLocked] = useState(false);
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [deck, setDeck] = useState<DeckPlayer[]>([]);
@@ -48,6 +49,20 @@ export default function TeamPage() {
     .then(res => res.json())
     .then(data => setRole(data.role));
 }, []);
+
+useEffect(() => {
+  if (!weekId) return;
+  fetch(`/api/week/status?weekId=${weekId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data?.startDate) {
+        const start = new Date(data.startDate);
+        setWeekLocked(new Date() >= start);
+      }
+    });
+}, [weekId]);
+
+
   useEffect(() => {
     const numericTeamId = teamId ? Number(teamId) : NaN;
     const numericWeekId = weekId ? Number(weekId) : NaN;
@@ -237,18 +252,20 @@ const teamOutlineColors: Record<string, string> = {
                               }}
                               className="w-20 h-8"
                             />
-                        <Button
+                    <Button
   variant="outline"
   size="sm"
-className={
-  teamName && teamOutlineColors[teamName]
-    ? teamOutlineColors[teamName]
-    : "text-gray-500 border-gray-500"
-}
+  className={
+    teamName && teamOutlineColors[teamName]
+      ? teamOutlineColors[teamName]
+      : "text-gray-500 border-gray-500"
+  }
   onClick={() => p.rate && handleUpdateRate(p.id, p.rate)}
+  disabled={weekLocked || isNaN(Number(p.rate))}
 >
   Valider
 </Button>
+
                           </div>
                         )}
                       </div>
@@ -297,6 +314,7 @@ className={
                           variant="destructive"
                           size="sm"
                           onClick={() => handleRemove(player.id)}
+                          disabled={weekLocked}
                         >
                           Retirer
                         </Button>
