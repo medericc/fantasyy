@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+
 export default function TermsPage() {
   const router = useRouter();
 
@@ -46,49 +46,47 @@ export default function TermsPage() {
             </p>
 
             <div>
-              <h2 className="text-lg font-semibold mb-1">1. Éditeur du site</h2>
+              <h2 className="text-lg font-semibold">1. Éditeur du site</h2>
                <p>
           Le site <strong>First Pick Fantasy League</strong> est édité par un particulier à titre non professionnel.
+          Adresse e-mail de contact :{" "}
+          <a href="mailto:firstpick46@gmail.com" className="text-blue-600 underline">firstpick46@gmail.com</a>.
         </p>
             </div>
 
             <div>
-              <h2 className="text-lg font-semibold mb-1">2. Hébergement</h2>
-             <p>
-  Le site est hébergé par :<br />
-  <strong>Vercel Inc.</strong><br />
-  440 N Barranca Ave #4133, Covina, CA 91723, États-Unis<br />
-  Site :
-  <Button
-    asChild
-    className=" mt-1 ml-2 gap-2 bg-gray-900 text-white hover:bg-gray-700"
-  >
-    <a
-      href="https://vercel.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center"
-    >
-      <ExternalLink className="h-4 w-4" />
-      vercel.com
-    </a>
-  </Button>
-</p>
+              <h2 className="text-lg font-semibold">2. Hébergement</h2>
+              <p>
+          Le site est hébergé par :<br />
+          <strong>Vercel Inc.</strong><br />
+          440 N Barranca Ave #4133, Covina, CA 91723, États-Unis<br />
+          Site :{" "}
+          <a href="https://vercel.com" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">
+            https://vercel.com
+          </a>
+        </p>
             </div>
 
             <div>
-              <h2 className="text-lg font-semibold mb-1">3. Propriété intellectuelle</h2>
+              <h2 className="text-lg font-semibold">3. Propriété intellectuelle</h2>
              <p>
           Tous les contenus du site (textes, images, graphismes, logo) sont la propriété exclusive de First Pick,
           sauf mentions contraires. Toute reproduction est interdite sans autorisation.
         </p>
             </div>
 
-          
+            <div>
+              <h2 className="text-lg font-semibold">
+                4. Données personnelles</h2>
+             <p>
+          Pour en savoir plus sur la gestion des données personnelles, veuillez consulter notre{" "}
+          <a href="/privacy" className="text-blue-600 underline">Politique de confidentialité</a>.
+        </p>
+            </div>
 
             <div>
-              <h2 className="text-lg font-semibold mb-1">
-                4. Cookies</h2>
+              <h2 className="text-lg font-semibold">
+                5. Cookies</h2>
             <p>
           Le site peut utiliser des cookies pour des mesures d’audience anonymes. Vous pouvez les refuser via le bandeau de consentement.
         </p>
