@@ -18,15 +18,22 @@ export default function TermsPage() {
       <main className="flex-1 w-full max-w-3xl mx-auto p-4 space-y-6 mt-5">
         {/* Bouton retour */}
         <div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-            className="flex items-center gap-2 shadow-md"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour
-          </Button>
+         <Button
+  variant="ghost"
+  size="sm"
+  onClick={() => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/dashboard");
+    }
+  }}
+  className="flex items-center gap-2 shadow-md"
+>
+  <ArrowLeft className="h-4 w-4" />
+  Retour
+</Button>
+
         </div>
 
         {/* Bloc CGU */}
