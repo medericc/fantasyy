@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardHeader,  CardContent, CardFooter } from '@/components/ui/card';
+import Image from 'next/image';
 
 type Team = { id: number; name: string };
 type Match = { id: number; date: string; team_home: Team; team_away: Team };
@@ -209,29 +210,32 @@ const handleRemove = async (playerId: number) => {
   className="justify-end"
   onClick={() => router.push(`/leagues/${slug}/team/${match.team_home.id}?weekId=${selectedWeek?.id}`)}
 >
-  <img
+  <Image
     src={teamLogos[match.team_home.name] || "/Logo_LBWL.png"}
     alt={match.team_home.name}
-    className="h-8 w-auto"
+    width={40} // ~taille 8
+    height={40}
+    className="h-10 w-auto"
   />
 </Button>
 
-                    
-                    <div className="text-center">
-                      <Badge variant="outline" className="px-3 py-1">
-                        VS
-                      </Badge>
-                    </div>
-                    
-                  <Button 
+<div className="text-center">
+  <Badge variant="outline" className="px-3 py-1">
+    VS
+  </Badge>
+</div>
+
+<Button 
   variant="link" 
   className="justify-start"
   onClick={() => router.push(`/leagues/${slug}/team/${match.team_away.id}?weekId=${selectedWeek?.id}`)}
 >
-  <img
+  <Image
     src={teamLogos[match.team_away.name] || "/Logo_LBWL.png"}
     alt={match.team_away.name}
-    className="h-8 w-auto"
+    width={40}
+    height={40}
+    className="h-10 w-auto"
   />
 </Button>
 
