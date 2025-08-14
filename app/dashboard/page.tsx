@@ -49,8 +49,11 @@ export default function DashboardPage() {
 
         const userJson = await resUser.json();
         const rankingJson = await resRanking.json();
+console.log("=== USER JSON ===", userJson);
+        if (Array.isArray(userJson) && userJson.length > 0) {
+  setUser(userJson[0]);
+}
 
-        setUser(userJson);
         setRankingData(rankingJson);
         setData(rankingJson);
         setLoading(false);
@@ -67,30 +70,47 @@ export default function DashboardPage() {
 
   const renderTable = (rankings: LeagueRanking[], title: string) => (
     <div className="mt-4 overflow-x-auto max-h-[70vh]">
-      <table className="w-full rounded-lg overflow-hidden border">
-        <thead className="bg-gray-800 sticky top-0">
-          <tr>
-            <th className="p-3 text-left text-white">#</th>
-            <th className="p-3 text-left text-white">Joueur</th>
-            <th className="p-3 text-left text-white">Points</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {rankings.map((r, i) => (
-            <tr
-              key={r.username}
-              className={`${user?.username === r.username ? 'bg-yellow-50 font-medium' : 'hover:bg-gray-50'}`}
-            >
-              <td className="p-3">{i + 1}</td>
-              <td className="p-3">{r.username}</td>
-              <td className="p-3 font-medium">
-                {modal.type === 'weekly' ? r.weekPoints : r.totalPoints}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+  <table className="w-full rounded-lg overflow-hidden border">
+    <thead className="bg-gray-800 sticky top-0">
+      <tr>
+        <th className="p-3 text-left text-white">#</th>
+        <th className="p-3 text-left text-white">Joueur</th>
+        <th className="p-3 text-left text-white">Points</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-200">
+      
+    {rankings.map((r, i) => {
+  const isCurrentUser = 
+    user?.username?.trim().toLowerCase() === r.username.trim().toLowerCase();
+ console.log(i + 1, r.username, "isCurrentUser:", isCurrentUser);
+  return (
+    <tr
+      key={r.username}
+      className={`${isCurrentUser ? 'bg-yellow-200 font-medium' : 'hover:bg-gray-50'}`}
+    >
+      <td className="p-3">{i + 1}</td>
+      <td className="p-3">
+        {isCurrentUser ? (
+          <span className="py-1 rounded font-semibold">
+            {r.username}
+          </span>
+        ) : (
+          r.username
+        )}
+      </td>
+      <td className="p-3 font-medium">
+        {modal.type === 'weekly' ? r.weekPoints : r.totalPoints}
+      </td>
+    </tr>
+  );
+})}
+
+
+    </tbody>
+  </table>
+</div>
+
   );
 
   const openWeeklyModal = (league: string) => {
