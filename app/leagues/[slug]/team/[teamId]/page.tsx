@@ -212,7 +212,7 @@ const renderPlayerCard = (p: Player) => (
     ) : isDeckFull ? (
       <Badge variant="outline">Limite atteinte</Badge>
     ) : (
-      <Button size="sm" onClick={() => handleAdd(p.id)} className="cursor-pointer">
+      <Button size="sm" onClick={() => handleAdd(p.id)} className="cursor-pointer"  disabled={weekLocked}>
         Ajouter
       </Button>
     )}
