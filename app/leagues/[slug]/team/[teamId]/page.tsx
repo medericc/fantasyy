@@ -165,6 +165,59 @@ useEffect(() => {
 //     alert('Points mis à jour !');
 //   }
 // };
+const renderPlayerCard = (p: Player) => (
+  <div 
+    key={p.id} 
+    className="flex items-center justify-between p-3 border rounded-lg"
+  >
+    <div>
+      <p className="font-medium">{p.forename} {p.name}</p>
+      {role === 'admin' && (
+        <div className="flex items-center gap-2 mt-1">
+          <Input
+            type="number"
+            value={p.rate ?? ''}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value) || 0;
+              setPlayers(prev => prev.map(pl => pl.id === p.id ? {...pl, rate: val} : pl));
+            }}
+            className="w-20 h-8"
+          />
+          <button
+            type="button"
+            onClick={() => p.rate && handleUpdateRate(p.id, p.rate)}
+            disabled={weekLocked || isNaN(Number(p.rate))}
+            className={`
+              px-3 py-1.5 text-sm font-medium rounded-md border transition-colors
+              ${teamName && teamOutlineColors[teamName]
+                ? teamOutlineColors[teamName]
+                : "text-gray-500 border-gray-500"
+              }
+              ${weekLocked || isNaN(Number(p.rate))
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-100"
+              }
+            `}
+          >
+            Valider
+          </button>
+        </div>
+      )}
+    </div>
+
+    {isInDeck(p.id) ? (
+      <Badge variant="secondary">Dans ton deck</Badge>
+    ) : blockedIds.includes(p.id) ? (
+      <Badge variant="outline">Indisponible</Badge>
+    ) : isDeckFull ? (
+      <Badge variant="outline">Limite atteinte</Badge>
+    ) : (
+      <Button size="sm" onClick={() => handleAdd(p.id)} className="cursor-pointer">
+        Ajouter
+      </Button>
+    )}
+  </div>
+);
 
 const handleUpdateRate = async (playerId: number, newRate: number) => {
     const res = await fetch('/api/admin/update-player-rate', {
@@ -179,28 +232,28 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
     }
   };
 const teamOutlineColors: Record<string, string> = {
-  "UF Angers": "text-black border-black",
-  "Lyon ASVEL": "text-pink-500 border-pink-500",
-  "Tango Bourges": "text-orange-500 border-orange-500",
-  "Charnay BBS": "text-pink-400 border-pink-400",
-  "ESBVA Lille": "text-red-500 border-red-500",
-  "Landerneau BB": "text-violet-500 border-violet-500",
-  "Basket Landes": "text-sky-300 border-sky-300",
-  "Lattes-Montpellier": "text-blue-500 border-blue-500",
-  "Roche Vendée": "text-red-500 border-red-500",
-  "Toulouse MB": "text-pink-500 border-pink-500",
-  "Charleville": "text-black border-black",
-  "Chartres BL": "text-blue-400 border-blue-400",
+  "UF Angers": "!text-black !border-black",
+  "Lyon ASVEL": "!text-pink-500 !border-pink-500",
+  "Tango Bourges": "!text-orange-500 !border-orange-500",
+  "Charnay BBS": "!text-pink-400 !border-pink-400",
+  "ESBVA Lille": "!text-red-500 !border-red-500",
+  "Landerneau BB": "!text-violet-500 !border-violet-500",
+  "Basket Landes": "!text-sky-300 !border-sky-300",
+  "Lattes-Montpellier": "!text-blue-500 !border-blue-500",
+  "Roche Vendée": "!text-red-500 !border-red-500",
+  "Toulouse MB": "!text-pink-500 !border-pink-500",
+  "Charleville": "!text-black !border-black",
+  "Chartres BL": "!text-blue-400 !border-blue-400",
 };
   return (
    <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-6">
+      <main className="flex-1 p-4 md:p-8 md:mt-10 md:max-w-[98rem] max-w-md mx-auto w-full space-y-6">
         <Button 
           variant="outline" 
           onClick={() => router.back()}
-          className="gap-2"
+          className="gap-2 md:gap-3 md:mt-2 cursor-pointer"
         >
           ← Retour
         </Button>
@@ -211,7 +264,7 @@ const teamOutlineColors: Record<string, string> = {
           <>
             <Card>
               <CardHeader className="text-center">
-             <CardTitle className="text-xl">
+             <CardTitle className="text-xl md:mt-2">
   {teamName ? `${teamName}` : `#${teamId}`}
 </CardTitle>
    <p className="text-gray-600">Semaine {weekId}</p>
@@ -226,68 +279,44 @@ const teamOutlineColors: Record<string, string> = {
 
             
             
-              <CardContent className="space-y-3">
-                {players.map(p => (
-                  <div 
-                    key={p.id} 
-                    className="flex items-center justify-between p-3 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                  
-                      
-                      <div>
-                        <p className="font-medium">{p.forename} {p.name}</p>
-                        {role === 'admin' && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <Input
-                              type="number"
-                              value={p.rate ?? ''}
-                              onChange={(e) => {
-                                const val = parseFloat(e.target.value) || 0;
-                                setPlayers(prev => 
-                                  prev.map(pl => 
-                                    pl.id === p.id ? {...pl, rate: val} : pl
-                                  )
-                                );
-                              }}
-                              className="w-20 h-8"
-                            />
-                    <Button
-  variant="outline"
-  size="sm"
-  className={
-    teamName && teamOutlineColors[teamName]
-      ? teamOutlineColors[teamName]
-      : "text-gray-500 border-gray-500"
-  }
-  onClick={() => p.rate && handleUpdateRate(p.id, p.rate)}
-  disabled={weekLocked || isNaN(Number(p.rate))}
->
-  Valider
-</Button>
+             <CardContent>
+ <div className="hidden md:grid md:mt-6 md:mb-6 grid-cols-2 gap-6 px-4">
 
-                          </div>
-                        )}
-                      </div>
-                    </div>
+    {(() => {
+      const half = Math.floor(players.length / 2);
+      const col1 = players.slice(0, half);
+      const col2 = players.slice(half, players.length % 2 === 0 ? players.length : players.length - 1);
+      const lastOdd = players.length % 2 === 1 ? players[players.length - 1] : null;
 
-                    {isInDeck(p.id) ? (
-                      <Badge variant="secondary">Dans ton deck</Badge>
-                    ) : blockedIds.includes(p.id) ? (
-                      <Badge variant="outline">Indisponible</Badge>
-                    ) : isDeckFull ? (
-                      <Badge variant="outline">Limite atteinte</Badge>
-                    ) : (
-                      <Button 
-                        size="sm"
-                        onClick={() => handleAdd(p.id)}
-                      >
-                        Ajouter
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
+      return (
+        <>
+          {/* Colonne gauche */}
+          <div className="space-y-3">
+            {col1.map(p => renderPlayerCard(p))}
+          </div>
+
+          {/* Colonne droite */}
+          <div className="space-y-3">
+            {col2.map(p => renderPlayerCard(p))}
+          </div>
+
+          {/* Si impair → joueuse centrée en bas */}
+          {lastOdd && (
+            <div className="col-span-2 flex justify-center mt-4">
+              <div className="w-full max-w-xs">{renderPlayerCard(lastOdd)}</div>
+            </div>
+          )}
+        </>
+      );
+    })()}
+  </div>
+
+  {/* Version mobile (une seule colonne) */}
+  <div className="md:hidden space-y-3">
+    {players.map(p => renderPlayerCard(p))}
+  </div>
+</CardContent>
+
             
 
             <Card>
@@ -315,6 +344,7 @@ const teamOutlineColors: Record<string, string> = {
                           size="sm"
                           onClick={() => handleRemove(player.id)}
                           disabled={weekLocked}
+                          className="cursor-pointer"
                         >
                           Retirer
                         </Button>
@@ -324,9 +354,9 @@ const teamOutlineColors: Record<string, string> = {
                 )}
               </CardContent>
               <CardFooter className="justify-center">
-                <Badge variant="outline">
-    {deck.length}/5 {deck.length === 1 ? "joueuse sélectionnée" : "joueuses sélectionnées"}
-  </Badge>
+               <Badge variant="outline">
+  {deck.length}/5 {deck.length <= 1 ? "joueuse sélectionnée" : "joueuses sélectionnées"}
+</Badge>
               </CardFooter>
             </Card>
           </>

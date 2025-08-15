@@ -156,7 +156,7 @@ console.log("=== USER JSON ===", userJson);
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       
-      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-8 mt-2 xl:mt-10">
+      <main className="flex-grow md:p-8 md:mt-10 md:max-w-4xl p-4 max-w-md mx-auto w-full space-y-8 xl:space-y-16 mt-2 xl:mt-20">
         <div className="bg-white p-2  shadow-sm border">
           <p className="text-center text-gray-700 ">
             Pour chaque journée, sélectionner jusqu&lsquo;à 5 joueuses. Toute joueuse choisie devient indisponible pendant 6 semaines. Les points sont attribués selon leurs performances réelles.
@@ -213,18 +213,19 @@ console.log("=== USER JSON ===", userJson);
             </div>
           );
         })}
-      </main>
-
-      {/* Play Button */}
-      <div className="p-4 max-w-md mx-auto w-full mb-2 xl:mb-10">
+         <div className="p-4 max-w-md mx-auto w-full mb-2 xl:mb-10">
         <Button 
           size="lg" 
-          className="w-full py-6 text-lg font-bold shadow-md bg-gradient-to-r from-yellow-600 to-yellow-600 hover:from-yellow-700 hover:to-yellow-700 text-white"
+          className="w-full py-6 text-lg cursor-pointer font-bold shadow-md bg-gradient-to-r from-yellow-600 to-yellow-600 hover:from-yellow-700 hover:to-yellow-700 text-white"
           onClick={() => router.push('/leagues/lfb')}
         >
           JOUER
         </Button>
       </div>
+      </main>
+
+      {/* Play Button */}
+     
 
       {/* Rankings Modals */}
       <Dialog open={modal.open} onOpenChange={(open) => setModal({...modal, open})}>

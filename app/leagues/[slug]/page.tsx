@@ -179,7 +179,7 @@ const handleRemove = async (playerId: number) => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 p-4 max-w-md mx-auto w-full space-y-6">
+      <main className="flex-1 p-4 md:p-8 md:mt-10 md:max-w-3xl max-w-md mx-auto w-full space-y-6">
       
         {/* Sélecteur de semaine */}
         <div className="space-y-2">
@@ -230,7 +230,7 @@ const handleRemove = async (playerId: number) => {
     alt={match.team_home.name}
     width={40} // ~taille 8
     height={40}
-    className="h-10 w-auto"
+    className="h-10 w-auto cursor-pointer md:h-12"
   />
 </Button>
 
@@ -250,7 +250,7 @@ const handleRemove = async (playerId: number) => {
     alt={match.team_away.name}
     width={40}
     height={40}
-    className="h-10 w-auto"
+    className="h-10 w-auto cursor-pointer md:h-12"
   />
 </Button>
 
@@ -293,6 +293,7 @@ const handleRemove = async (playerId: number) => {
                           size="sm"
                           onClick={() => handleRemove(player.id)}
                           disabled={weekLocked}
+                          className='cursor-pointer'
                         >
                           Retirer
                         </Button>
@@ -304,9 +305,10 @@ const handleRemove = async (playerId: number) => {
     )}
   </CardContent>
   <CardFooter className="justify-center">
-  <Badge variant="outline">
-    {deck.length}/5 {deck.length === 1 ? "joueuse sélectionnée" : "joueuses sélectionnées"}
-  </Badge>
+ <Badge variant="outline">
+  {deck.length}/5 {deck.length <= 1 ? "joueuse sélectionnée" : "joueuses sélectionnées"}
+</Badge>
+
   </CardFooter>
 </Card>
  </main>
