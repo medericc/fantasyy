@@ -1,5 +1,7 @@
 scannng779@
 
+metadata et image ordi dashabord
+
 DELIMITER $$
 CREATE TRIGGER after_insert_player_rate
 AFTER INSERT ON player_rate
