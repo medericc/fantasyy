@@ -9,16 +9,21 @@ export async function POST(request: Request) {
       return Response.json({ error: "Missing parameters" }, { status: 400 });
     }
 
+    const parsedWeekId = parseInt(weekId, 10);
+    if (isNaN(parsedWeekId)) {
+      return Response.json({ error: "Invalid weekId" }, { status: 400 });
+    }
+
     // 1️⃣ Met à jour ou crée la note du joueur pour la semaine
     await prisma.player_rate.upsert({
-      where: { player_id_week_id: { player_id: playerId, week_id: weekId } },
+      where: { player_id_week_id: { player_id: playerId, week_id: parsedWeekId } },
       update: { rate },
-      create: { player_id: playerId, week_id: weekId, rate },
+      create: { player_id: playerId, week_id: parsedWeekId, rate },
     });
 
     // 2️⃣ Met à jour toutes les lignes choice correspondantes
     await prisma.choice.updateMany({
-      where: { player_id: playerId, week_id: weekId },
+      where: { player_id: playerId, week_id: parsedWeekId },
       data: { points: rate },
     });
 
@@ -39,7 +44,7 @@ export async function POST(request: Request) {
 
     return Response.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("Erreur /api/admin/update-player-rate :", err);
     return Response.json({ error: "Server error" }, { status: 500 });
   }
 }

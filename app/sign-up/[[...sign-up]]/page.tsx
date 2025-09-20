@@ -19,6 +19,8 @@ export default function SignUpPage() {
 
         {/* Formulaire Clerk */}
         <SignUp
+          forceRedirectUrl="/"
+  signInFallbackRedirectUrl="/"
           appearance={{
             layout: {
               socialButtonsPlacement: "bottom",

@@ -29,8 +29,6 @@ export default async function Home() {
       },
     });
   }
- if (dbUser.pseudo) {
-    redirect("/dashboard");
-  }
+ 
   return <ClientPage pseudo={dbUser.pseudo} />;
 }

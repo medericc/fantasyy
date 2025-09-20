@@ -223,7 +223,7 @@ const handleUpdateRate = async (playerId: number, newRate: number) => {
     const res = await fetch('/api/admin/update-player-rate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId, weekId, rate: newRate }),
+      body: JSON.stringify({ playerId, weekId: Number(weekId), rate: newRate }),
     });
     
     if (!res.ok) {

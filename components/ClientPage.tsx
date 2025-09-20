@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updatePseudo } from "../actions/secretActions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,11 @@ export default function ClientPage({ pseudo }: { pseudo: string | null }) {
   const [input, setInput] = useState("");
   const router = useRouter();
 
+    useEffect(() => {
+    if (pseudo) {
+      router.replace("/dashboard");
+    }
+  }, [pseudo, router]);
  const handleSubmit = async () => {
   const trimmed = input.trim();
   
@@ -30,7 +35,7 @@ export default function ClientPage({ pseudo }: { pseudo: string | null }) {
   }
 };
 
-
+  if (pseudo) return null;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-sm rounded-2xl" onInteractOutside={(e) => e.preventDefault()}>
