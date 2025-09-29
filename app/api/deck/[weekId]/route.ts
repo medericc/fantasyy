@@ -1,12 +1,16 @@
-// app/api/deck/[weekId]/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
 import { getCurrentUserId } from '@/lib/auth';
 
-export async function GET(_req: Request, { params }: { params: { weekId: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { weekId: string } }
+) {
   const userId = await getCurrentUserId();
-  const weekId = Number(params.weekId);
- console.log("🔍 API /deck - userId:", userId, "weekId reçu:", weekId);
+  const weekId = Number(context.params.weekId);
+
+  console.log("🔍 API /deck - userId:", userId, "weekId reçu:", weekId);
+
   if (!userId || isNaN(weekId)) {
     return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
   }
