@@ -1,4 +1,6 @@
 // app/api/admin/update-player-rate/route.ts
+export const runtime = "nodejs";
+
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
