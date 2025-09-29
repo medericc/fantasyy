@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import CookieBanner from "@/components/CookieBanner";
-
+import { Analytics } from "@vercel/analytics/next"
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -81,6 +81,7 @@ export default function RootLayout({
         >
           {children}
           <CookieBanner />
+           <Analytics />
         </body>
       </html>
     </ClerkProvider>
