@@ -1,4 +1,5 @@
 // lib/ranking_total.ts
+export const runtime = "nodejs";
 import { prisma } from '@/lib/prisma';
 
 export async function getWeeklyRanking(leagueId: number, weekId: number) {

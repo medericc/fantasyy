@@ -1,4 +1,5 @@
 // app/api/dashboard/rankings/route.ts
+export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { getTotalRanking, getWeeklyRanking } from '@/lib/ranking_total';
 import { prisma } from '@/lib/prisma';

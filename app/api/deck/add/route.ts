@@ -1,4 +1,5 @@
 // app/api/deck/add/route.ts
+export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUserId } from '@/lib/auth';

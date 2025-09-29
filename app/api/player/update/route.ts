@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { upsertPlayerRate } from '@/lib/update';
 import { getCurrentUserId } from '@/lib/auth';

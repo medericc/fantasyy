@@ -1,4 +1,5 @@
 // app/api/players/by-team/[teamId]/route.ts
+export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import type { NextRequest } from 'next/server';

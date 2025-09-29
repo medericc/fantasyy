@@ -1,4 +1,5 @@
 // app/api/games/by-week/[weekId]/route.ts
+export const runtime = "nodejs";
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';

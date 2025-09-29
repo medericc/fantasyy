@@ -1,4 +1,5 @@
 // lib/auth.ts
+export const runtime = "nodejs";
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from '@/lib/prisma';
 

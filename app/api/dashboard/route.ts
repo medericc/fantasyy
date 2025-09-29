@@ -1,4 +1,5 @@
 // app/api/dashboard/route.ts
+export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { getCurrentUserId } from '@/lib/auth'; // à adapter selon ton auth
 import { getTotalRanking, getWeeklyRanking } from '@/lib/ranking_total';
