@@ -33,11 +33,11 @@ export const metadata: Metadata = {
     title: "Fantasy League LFB | Basket Féminin",
     description:
       "Participe à la première Fantasy League sur le basket féminin français (LFB) ! Sélectionne tes joueuses, gagne des points et défie tes amis.",
-    url: "https://ton-domaine.com",
+    url: "www.lfbfantasy.com",
     siteName: "Fantasy LFB",
     images: [
       {
-        url: "https://ton-domaine.com/og-image.jpg",
+        url: "www.lfbfantasy.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Fantasy League LFB",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     title: "Fantasy League LFB | Basket Féminin",
     description:
       "La première Fantasy League sur le basket féminin français (LFB) ! Compose ton équipe et suis tes stats en direct.",
-    images: ["https://ton-domaine.com/og-image.jpg"],
+    images: ["www.lfbfantasy.com/og-image.jpg"],
     creator: "@tonTwitter",
   },
   icons: {
