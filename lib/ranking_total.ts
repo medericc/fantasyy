@@ -47,7 +47,7 @@ export async function getTotalRanking(leagueId: number) {
   // On récupère tous les utilisateurs ayant participé dans cette ligue
   const users = await prisma.user.findMany({
     select: {
-      id: true,
+      id: true,             // ✅ on prend aussi l'id
       pseudo: true,
       choice: {
         where: {
@@ -67,6 +67,7 @@ export async function getTotalRanking(leagueId: number) {
     );
 
     return {
+      userId: user.id,       // ✅ ajouté
       pseudo: user.pseudo ?? 'Anonyme',
       points: totalPoints,
     };
@@ -75,3 +76,4 @@ export async function getTotalRanking(leagueId: number) {
   // Classement décroissant
   return rankings.sort((a, b) => b.points - a.points);
 }
+

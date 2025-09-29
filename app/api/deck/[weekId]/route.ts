@@ -4,27 +4,29 @@ import { getCurrentUserId } from '@/lib/auth';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { weekId: string } }
+  { params }: { params: Promise<{ weekId: string }> } // <- params est maintenant un Promise
 ) {
   const userId = await getCurrentUserId();
-  const weekId = Number(context.params.weekId);
 
-  console.log("🔍 API /deck - userId:", userId, "weekId reçu:", weekId);
+  const { weekId } = await params;           // <- attendre params
+  const weekIdNum = Number(weekId);
 
-  if (!userId || isNaN(weekId)) {
+  console.log("🔍 API /deck - userId:", userId, "weekId reçu:", weekIdNum);
+
+  if (!userId || isNaN(weekIdNum)) {
     return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
   }
 
   const choices = await prisma.choice.findMany({
     where: {
       user_id: userId,
-      week_id: weekId,
+      week_id: weekIdNum,
     },
     include: {
       player: {
         include: {
           player_rate: {
-            where: { week_id: weekId },
+            where: { week_id: weekIdNum },
             select: { rate: true },
           },
         },

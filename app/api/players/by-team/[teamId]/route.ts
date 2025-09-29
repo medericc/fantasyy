@@ -3,19 +3,21 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import type { NextRequest } from 'next/server';
 import { getCurrentUserId } from '@/lib/auth';
+
 export async function GET(
   request: NextRequest,
-  context: { params: { teamId: string } }
+  { params }: { params: Promise<{ teamId: string }> }
 ) {
   const userId = await getCurrentUserId();
-  const teamId = Number(context.params.teamId);
+   const { teamId } = await params;
+    const teamIdNum = Number(teamId);
   const url = new URL(request.url);
  
   const currentWeek = Number(url.searchParams.get('weekId'));
 
   console.log('[API] teamId:', teamId, 'userId:', userId, 'weekId:', currentWeek);
 
-  if (!userId || !currentWeek || isNaN(teamId)) {
+  if (!userId || !currentWeek || isNaN(teamIdNum)) {
     return NextResponse.json(
       { error: 'userId, weekId, and teamId must be valid numbers' },
       { status: 400 }
@@ -23,7 +25,7 @@ export async function GET(
   }
 
   const players = await prisma.player.findMany({
-    where: { team_id: teamId },
+    where: { team_id: teamIdNum },
   });
 
   console.log('[API] Players fetched:', players.length);

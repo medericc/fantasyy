@@ -67,7 +67,7 @@ console.log("=== USER JSON ===", userJson);
 
   const weeks = (league: string) =>
     Object.keys(data[league]?.weekly || {}).sort();
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
  const renderTable = (rankings: LeagueRanking[], title: string) => {
   if (!user?.username) return null;
 

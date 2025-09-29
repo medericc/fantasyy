@@ -16,7 +16,8 @@ export async function GET() {
     orderBy: { id: 'asc' },
   });
 
-  const weekly: Record<string, any[]> = {};
+ // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const weekly: Record<string, any[]> = {};
 
   for (const week of weeks) {
     const ranking = await getWeeklyRanking(leagueId, week.id);

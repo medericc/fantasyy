@@ -20,7 +20,11 @@ if (typeof playerId !== 'number' || typeof weekId !== 'number' || typeof newRate
   try {
     await upsertPlayerRate(playerId, weekId, newRate);
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
+  if (err instanceof Error) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
+  return NextResponse.json({ error: "Erreur inconnue" }, { status: 400 });
+}
+
 }

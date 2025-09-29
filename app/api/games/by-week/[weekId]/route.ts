@@ -5,16 +5,17 @@ import type { NextRequest } from 'next/server';
 
 export async function GET(
   _req: NextRequest,
-  context: { params: { weekId: string } }
+  { params }: { params: Promise<{ weekId: string }> } // ✅ params est un Promise
 ) {
-  const weekId = Number(context.params.weekId);
+  const { weekId } = await params;  // ✅ on attend params
+  const weekIdNum = Number(weekId);
 
-  if (isNaN(weekId)) {
+  if (isNaN(weekIdNum)) {
     return NextResponse.json({ error: 'Invalid weekId' }, { status: 400 });
   }
 
   const games = await prisma.game.findMany({
-    where: { week_id: weekId },
+    where: { week_id: weekIdNum },
     include: {
       team_home: true,
       team_away: true,

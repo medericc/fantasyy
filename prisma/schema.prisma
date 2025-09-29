@@ -41,14 +41,14 @@ model doctrine_migration_versions {
 }
 
 model game {
-  id           Int   @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   team_home_id Int?
   team_away_id Int
   week_id      Int
-  match_date   DateTime
-  team_away    team  @relation("AwayGames", fields: [team_away_id], references: [id])
-  team_home    team? @relation("HomeGames", fields: [team_home_id], references: [id])
-  week         week  @relation(fields: [week_id], references: [id])
+  match_date   DateTime? @db.DateTime(0)
+  team_away    team      @relation("AwayGames", fields: [team_away_id], references: [id])
+  team_home    team?     @relation("HomeGames", fields: [team_home_id], references: [id])
+  week         week      @relation(fields: [week_id], references: [id])
 
   @@unique([team_home_id, team_away_id, week_id])
   @@index([week_id])
@@ -96,7 +96,7 @@ model player_rate {
   player    player @relation(fields: [player_id], references: [id], onUpdate: Restrict, map: "FK_7DF66F0A99E6F5DF")
   week      week   @relation(fields: [week_id], references: [id], onUpdate: Restrict, map: "FK_7DF66F0AC86F3B2F")
 
-  @@unique([player_id, week_id])
+  @@unique([player_id, week_id], map: "uniq_playerid_weekid")
   @@index([player_id], map: "IDX_7DF66F0A99E6F5DF")
   @@index([week_id], map: "IDX_7DF66F0AC86F3B2F")
 }
@@ -117,16 +117,15 @@ model team {
 model user {
   id          Int      @id @default(autoincrement())
   email       String   @unique(map: "UNIQ_8D93D649E7927C74") @db.VarChar(180)
-  roles       Json     
+  roles       String   @db.LongText
   password    String   @db.VarChar(255)
   pseudo      String?  @unique @db.VarChar(50)
   ptl_lfb     Float    @default(0)
   reset_token String?  @db.VarChar(255)
-  clerk_id    String?  @db.VarChar(3600)
+  clerk_id    String?  @unique @db.VarChar(3600)
   badge       badge?
   choice      choice[]
-
-  @@unique([clerk_id])
+  secret      String?  @db.VarChar(191)
 }
 
 model week {

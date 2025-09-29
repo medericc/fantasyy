@@ -23,7 +23,8 @@ export default async function Home() {
       data: {
         email,
         clerk_id: clerkId,
-        roles: ['user'],
+        roles: 'user',   // ✅ string
+
         password: '',
         pseudo: null,  // Assure-toi d’avoir ce champ dans ton modèle Prisma
       },
