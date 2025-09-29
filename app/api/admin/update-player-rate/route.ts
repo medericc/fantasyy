@@ -2,18 +2,18 @@
 export const runtime = "nodejs";
 
 import { prisma } from "@/lib/prisma";
-
+import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const { playerId, weekId, rate } = await request.json();
 
     if (!playerId || !weekId || rate === undefined) {
-      return Response.json({ error: "Missing parameters" }, { status: 400 });
+      return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
     }
 
     const parsedWeekId = parseInt(weekId, 10);
     if (isNaN(parsedWeekId)) {
-      return Response.json({ error: "Invalid weekId" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid weekId" }, { status: 400 });
     }
 
     // 1️⃣ Met à jour ou crée la note du joueur pour la semaine
@@ -44,13 +44,13 @@ export async function POST(request: Request) {
       });
     }
 
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Erreur /api/admin/update-player-rate :", err);
-    return Response.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 export function GET() {
-  return Response.json({ error: "Method not allowed" }, { status: 405 });
+  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }
