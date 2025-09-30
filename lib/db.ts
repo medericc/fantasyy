@@ -9,13 +9,7 @@ export const prisma =
     log: ['query'], // utile en dev
   });
 
-// 👉 Log de la DATABASE_URL masquée (mot de passe remplacé par ****)
-if (process.env.DATABASE_URL) {
-  console.log(
-    "DATABASE_URL:",
-    process.env.DATABASE_URL.replace(/:\/\/(.*):(.*)@/, "://$1:****@")
-  );
-}
+
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 

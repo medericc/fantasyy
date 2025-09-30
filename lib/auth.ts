@@ -7,11 +7,22 @@ export async function getCurrentUserId(): Promise<number> {
   const user = await currentUser();
   if (!user || !user.id) throw new Error("Unauthorized");
 
-  const dbUser = await prisma.user.findUnique({
+  let dbUser = await prisma.user.findUnique({
     where: { clerk_id: user.id },
   });
 
-  if (!dbUser) throw new Error("User not found in DB");
+  // S’il n’existe pas encore, le créer directement ici (comme tu fais dans page.tsx)
+  if (!dbUser) {
+    dbUser = await prisma.user.create({
+      data: {
+        email: user.emailAddresses[0]?.emailAddress ?? "",
+        clerk_id: user.id,
+        roles: "user",
+        password: "",
+        pseudo: null,
+      },
+    });
+  }
 
-  return dbUser.id; // l’ID de ta table `user`, pas Clerk
+  return dbUser.id;
 }
