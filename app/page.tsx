@@ -1,4 +1,5 @@
 // app/page.tsx
+export const runtime = "nodejs";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
